@@ -1,9 +1,25 @@
 <!DOCTYPE html>
+<!--
+  Compound Bow Kinetic Energy Calculator
+  VERSION: 1.5.0
+  Changelog:
+    v1.0.0 - Initial KE/momentum/FOC calculator with basic game-class table
+    v1.1.0 - Added component vs. total-weight entry modes, broadhead weight dropdown (100/125/200/custom)
+    v1.2.0 - Expanded game classes (Plains Game, Sable/Roan, Moose/Brown Bear/Grizzly, Cape Buffalo),
+             added Bighorn Sheep, Elk, Pronghorn Antelope to correct tiers, capitalized animal names
+    v1.3.0 - Added Recommended Easton Arrow column (incl. Easton Dangerous Game for Cape Buffalo),
+             switched Status column to color-coded green/red dots, changed page background to black
+    v1.4.0 - New defaults: 75 lb draw weight, 285 fps, 29.5" arrow length, 433 gr shaft, 50 gr insert,
+             100 gr broadhead. Restored Recommended Easton Arrow via clickable row + popup modal.
+    v1.4.1 - Corrected default shaft weight to 388 gr (was 433 gr). New total arrow weight: 538 gr.
+    v1.5.0 - Added "Easton 5mm Axis 260 Match Grade" reference note to Arrow Build card header.
+             Changed default arrow speed to 289 fps (was 285 fps). New KE at defaults: ~99.8 ft-lbs.
+-->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Compound Bow Kinetic Energy Calculator</title>
+<title>Compound Bow Kinetic Energy Calculator — v1.5.0</title>
 <style>
   :root{
     --bg:#000000;
@@ -27,7 +43,7 @@
     padding:24px 16px 60px;
   }
   .wrap{
-    max-width:1100px;
+    max-width:1000px;
     margin:0 auto;
   }
   header{
@@ -44,6 +60,18 @@
     color:var(--text-dim);
     margin:0;
     font-size:0.95rem;
+  }
+  .version-tag{
+    display:inline-block;
+    margin-top:10px;
+    padding:3px 11px;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:20px;
+    font-size:0.72rem;
+    color:#8a9a90;
+    letter-spacing:0.5px;
+    font-family:'Courier New',monospace;
   }
   .grid{
     display:grid;
@@ -62,13 +90,23 @@
   }
   .card h2{
     font-size:1.05rem;
-    margin:0 0 16px;
+    margin:0 0 4px;
     color:var(--accent);
-    border-bottom:1px solid var(--border);
     padding-bottom:10px;
     display:flex;
     align-items:center;
     gap:8px;
+  }
+  .card h2.with-border{
+    border-bottom:1px solid var(--border);
+  }
+  .arrow-ref-note{
+    font-size:0.75rem;
+    color:#bfae8e;
+    margin:0 0 14px;
+    padding-bottom:12px;
+    border-bottom:1px solid var(--border);
+    line-height:1.4;
   }
   .field{
     margin-bottom:16px;
@@ -249,7 +287,6 @@
     width:100%;
     border-collapse:collapse;
     font-size:0.85rem;
-    min-width:820px;
   }
   .ethics-table th, .ethics-table td{
     padding:9px 10px;
@@ -264,6 +301,13 @@
     text-transform:uppercase;
     letter-spacing:0.4px;
   }
+  .ethics-table tbody tr{
+    cursor:pointer;
+    transition:background .12s;
+  }
+  .ethics-table tbody tr:hover{
+    background:rgba(201,138,63,0.12);
+  }
   .ethics-table tr.active{
     background:rgba(201,138,63,0.08);
   }
@@ -271,10 +315,9 @@
     color:#6c7570;
     font-size:0.78rem;
   }
-  .ethics-table td.arrow-rec{
-    color:#bfae8e;
-    font-size:0.8rem;
-    font-weight:500;
+  .ethics-table td.game-name{
+    color:var(--accent);
+    font-weight:600;
   }
   .status-cell{
     display:flex;
@@ -303,6 +346,13 @@
     margin-top:34px;
     line-height:1.6;
   }
+  footer .version-footer{
+    display:block;
+    margin-top:14px;
+    color:#3d443f;
+    font-size:0.72rem;
+    font-family:'Courier New',monospace;
+  }
   .btn-reset{
     margin-top:6px;
     width:100%;
@@ -320,6 +370,88 @@
     border-color:var(--accent);
     color:var(--accent);
   }
+
+  .modal-overlay{
+    display:none;
+    position:fixed;
+    top:0;left:0;right:0;bottom:0;
+    background:rgba(0,0,0,0.8);
+    z-index:1000;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+  .modal-overlay.open{
+    display:flex;
+  }
+  .modal-box{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:16px;
+    max-width:460px;
+    width:100%;
+    padding:26px 28px;
+    box-shadow:0 12px 40px rgba(0,0,0,0.85);
+    position:relative;
+  }
+  .modal-close{
+    position:absolute;
+    top:14px;
+    right:16px;
+    background:none;
+    border:none;
+    color:var(--text-dim);
+    font-size:1.4rem;
+    cursor:pointer;
+    line-height:1;
+    padding:4px;
+  }
+  .modal-close:hover{
+    color:var(--text);
+  }
+  .modal-box h3{
+    margin:0 0 4px;
+    color:var(--accent);
+    font-size:1.2rem;
+  }
+  .modal-box .modal-examples{
+    color:#6c7570;
+    font-size:0.82rem;
+    margin-bottom:18px;
+  }
+  .modal-row{
+    display:flex;
+    justify-content:space-between;
+    padding:10px 0;
+    border-bottom:1px solid var(--border);
+    font-size:0.88rem;
+  }
+  .modal-row .modal-label{
+    color:var(--text-dim);
+  }
+  .modal-row .modal-value{
+    color:var(--text);
+    font-weight:700;
+    text-align:right;
+  }
+  .modal-arrow-name{
+    margin-top:16px;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:14px 16px;
+  }
+  .modal-arrow-name .arrow-title{
+    color:#bfae8e;
+    font-weight:700;
+    font-size:1rem;
+    margin-bottom:6px;
+  }
+  .modal-arrow-name .arrow-desc{
+    color:var(--text-dim);
+    font-size:0.82rem;
+    line-height:1.5;
+  }
 </style>
 </head>
 <body>
@@ -327,11 +459,12 @@
   <header>
     <h1>🏹 Compound Bow Kinetic Energy Calculator</h1>
     <p>Estimate arrow KE, momentum, and FOC for hunting setups — from small game to Cape Buffalo.</p>
+    <span class="version-tag">v1.5.0</span>
   </header>
 
   <div class="grid">
     <div class="card">
-      <h2>Bow Setup</h2>
+      <h2 class="with-border">Bow Setup</h2>
       <div class="field">
         <label>Draw weight <span class="unit">lbs</span></label>
         <input type="number" id="drawWeight" value="75" min="1" step="0.5">
@@ -339,13 +472,14 @@
       </div>
       <div class="field">
         <label>Arrow speed (chronographed) <span class="unit">fps</span></label>
-        <input type="number" id="speed" value="285" min="1" step="1">
+        <input type="number" id="speed" value="289" min="1" step="1">
         <div class="hint">Use your actual chronograph reading with this exact arrow — bow-rated IBO speed will overstate real performance.</div>
       </div>
     </div>
 
     <div class="card">
       <h2>Arrow Build</h2>
+      <div class="arrow-ref-note">Reference shaft: Easton 5mm Axis 260 Match Grade (11.5 GPI, .001" straightness) — default values below approximate a 29.5" build on this shaft with brass HIT insert and 100 gr broadhead.</div>
 
       <div class="mode-toggle">
         <button class="mode-btn active" id="modeComponentBtn" onclick="setMode('component')">Enter by component</button>
@@ -355,51 +489,51 @@
       <div class="component-fields visible" id="componentFields">
         <div class="field">
           <label>Arrow length <span class="unit">inches</span></label>
-          <input type="number" id="arrowLength" value="29" min="1" step="0.25">
+          <input type="number" id="arrowLength" value="29.5" min="1" step="0.25">
         </div>
         <div class="row-inline">
           <div class="field">
             <label>Shaft weight <span class="unit">grains</span></label>
-            <input type="number" id="arrowWeight" value="350" min="1" step="1">
+            <input type="number" id="arrowWeight" value="388" min="1" step="1">
             <div class="hint" style="margin-top:5px;">Bare shaft only (no point/insert).</div>
           </div>
           <div class="field">
             <label>Insert + nock + vanes <span class="unit">grains</span></label>
-            <input type="number" id="hardwareWeight" value="25" min="0" step="1">
+            <input type="number" id="hardwareWeight" value="50" min="0" step="1">
             <div class="hint" style="margin-top:5px;">Optional — leave 0 to ignore.</div>
           </div>
         </div>
         <div class="field">
           <label>Broadhead / point weight <span class="unit">grains</span></label>
           <select id="headWeightSelect">
-            <option value="100">100 gr</option>
-            <option value="125" selected>125 gr</option>
+            <option value="100" selected>100 gr</option>
+            <option value="125">125 gr</option>
             <option value="200">200 gr</option>
             <option value="custom">Custom…</option>
           </select>
-          <input type="number" id="headWeightCustom" value="125" min="0" step="1" style="margin-top:8px;display:none;" placeholder="Enter custom broadhead weight (grains)">
+          <input type="number" id="headWeightCustom" value="100" min="0" step="1" style="margin-top:8px;display:none;" placeholder="Enter custom broadhead weight (grains)">
         </div>
       </div>
 
       <div class="total-fields" id="totalFields">
         <div class="field">
           <label>Arrow length <span class="unit">inches</span></label>
-          <input type="number" id="arrowLengthTotal" value="29" min="1" step="0.25">
+          <input type="number" id="arrowLengthTotal" value="29.5" min="1" step="0.25">
         </div>
         <div class="field">
           <label>Total arrow weight (includes broadhead + insert) <span class="unit">grains</span></label>
-          <input type="number" id="totalArrowWeightInput" value="500" min="1" step="1">
+          <input type="number" id="totalArrowWeightInput" value="538" min="1" step="1">
           <div class="hint">Fully assembled, finished arrow weight — shaft, insert, nock, vanes, and broadhead all included.</div>
         </div>
         <div class="field">
           <label>Broadhead / point weight <span class="unit">grains</span></label>
           <select id="headWeightSelectTotal">
-            <option value="100">100 gr</option>
-            <option value="125" selected>125 gr</option>
+            <option value="100" selected>100 gr</option>
+            <option value="125">125 gr</option>
             <option value="200">200 gr</option>
             <option value="custom">Custom…</option>
           </select>
-          <input type="number" id="headWeightCustomTotal" value="125" min="0" step="1" style="margin-top:8px;display:none;" placeholder="Enter custom broadhead weight (grains)">
+          <input type="number" id="headWeightCustomTotal" value="100" min="0" step="1" style="margin-top:8px;display:none;" placeholder="Enter custom broadhead weight (grains)">
           <div class="hint">Used only to estimate FOC — subtracted from total to infer shaft+hardware weight.</div>
         </div>
       </div>
@@ -445,12 +579,13 @@
     <div class="ethics-table-wrap">
       <table class="ethics-table">
         <thead>
-          <tr><th>Game Class</th><th>Examples</th><th>Min. KE</th><th>Recommended Easton Arrow</th><th>Status</th></tr>
+          <tr><th>Game Class</th><th>Examples</th><th>Min. KE</th><th>Status</th></tr>
         </thead>
         <tbody id="ethicsBody">
         </tbody>
       </table>
     </div>
+    <div class="hint" style="margin-top:10px;text-align:center;">Click any row to see the recommended Easton arrow for that game class.</div>
   </div>
 
   <footer>
@@ -461,12 +596,33 @@
     Elk sits in the Large Game tier (42-65 ft-lbs); many hunters target the upper half of that range (55-65 ft-lbs) for margin, but Elk is not classified in the 65+ tier by itself.
     Sable and Roan are large-bodied, tough antelope commonly held to the same 65 ft-lb large-game floor as Kudu, Zebra, Eland, Gemsbok, and Wildebeest.
     Cape Buffalo reflects the South African legal minimum (80 lb draw weight, 80 ft-lbs KE, 750 gr minimum arrow weight, two-blade cut-on-contact broadhead required).<br>
-    Arrow recommendations are based on Easton's current hunting lineup (Axis, FMJ, 6.5mm, Dangerous Game, Easton 5.0) matched by grains-per-inch and penetration design to typical hide/bone toughness for each class.
-    The Easton 5mm FMJ Dangerous Game (250 spine, 17.7 GPI, N-FUSED carbon core with 7075 alloy metal jacket) is Easton's dedicated shaft for Cape Buffalo and other thick-skinned dangerous game — real-world hunters typically build it out to 750-950+ grain finished arrows to meet legal and penetration requirements.<br>
+    The reference shaft (Easton 5mm Axis 260 Match Grade, 11.5 GPI) is a stiff-spine, heavy-duty option built for high draw weights and heavier arrow builds — well-suited to the 75 lb / 29.5" setup modeled by the defaults.
+    The Easton 5mm FMJ Dangerous Game (250 spine, 17.7 GPI, N-FUSED carbon core with 7075 alloy metal jacket) is Easton's dedicated shaft for Cape Buffalo and other thick-skinned dangerous game.<br>
     Green indicates your current setup meets or exceeds that game class's minimum KE; red indicates it falls short.
-    Always verify spine selection with Easton's arrow selector for your specific draw weight and length, and confirm current law and your specific outfitter/PH requirements before a hunt — regulations vary by species, location, and season.
+    Always verify spine selection with Easton's arrow selector for your specific draw weight and length, and confirm current law and your specific outfitter/PH requirements before a hunt.
     Always verify actual arrow speed with a chronograph — calculated IBO speeds are optimistic.
+    <span class="version-footer">Compound Bow Kinetic Energy Calculator — Version 1.5.0</span>
   </footer>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <button class="modal-close" id="modalCloseBtn">&times;</button>
+    <h3 id="modalTitle">—</h3>
+    <div class="modal-examples" id="modalExamples">—</div>
+    <div class="modal-row">
+      <span class="modal-label">Minimum KE Required</span>
+      <span class="modal-value" id="modalMinKE">—</span>
+    </div>
+    <div class="modal-row">
+      <span class="modal-label">Your Current KE</span>
+      <span class="modal-value" id="modalYourKE">—</span>
+    </div>
+    <div class="modal-arrow-name">
+      <div class="arrow-title" id="modalArrowTitle">—</div>
+      <div class="arrow-desc" id="modalArrowDesc">—</div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -499,17 +655,39 @@ const modeTotalBtn = document.getElementById('modeTotalBtn');
 const componentFields = document.getElementById('componentFields');
 const totalFields = document.getElementById('totalFields');
 
-// Game thresholds per Easton/IBO published ranges plus South African / Namibian
-// legal bowhunting minimums. Arrow recommendations map Easton's current hunting
-// lineup (by GPI/construction) to the hide/bone toughness typical of each class.
+const modalOverlay = document.getElementById('modalOverlay');
+const modalTitle = document.getElementById('modalTitle');
+const modalExamples = document.getElementById('modalExamples');
+const modalMinKE = document.getElementById('modalMinKE');
+const modalYourKE = document.getElementById('modalYourKE');
+const modalArrowTitle = document.getElementById('modalArrowTitle');
+const modalArrowDesc = document.getElementById('modalArrowDesc');
+const modalCloseBtn = document.getElementById('modalCloseBtn');
+
+let lastComputedKE = 0;
+
 const gameThresholds = [
-  {name:'Small Game', examples:'Bushbuck, Duiker, Klipspringer, Rabbit', min:25, badgeClass:'small-game', arrow:'6.5mm Bowhunter or 5mm FMJ'},
-  {name:'Medium Game', examples:'Whitetail, Mule Deer, Pronghorn Antelope, Bighorn Sheep, Impala, Warthog', min:40, badgeClass:'medium-game', arrow:'5mm Axis or 6.5mm Hunter Classic'},
-  {name:'Large Game', examples:'Elk, Black Bear, Wild Boar, Nyala', min:50, badgeClass:'large-game', arrow:'5mm Axis (heavy spine) or 4mm FMJ'},
-  {name:'Plains Game (Large Antelope)', examples:'Kudu, Zebra, Eland, Gemsbok, Wildebeest', min:65, badgeClass:'plains-game', arrow:'4mm FMJ or 5mm FMJ Max'},
-  {name:'Sable / Roan', examples:'Sable Antelope, Roan Antelope', min:65, badgeClass:'large-antelope', arrow:'4mm FMJ or Easton 5.0'},
-  {name:'Moose / Brown Bear / Grizzly', examples:'Moose, Brown Bear, Grizzly', min:65, badgeClass:'toughest-game', arrow:'FMJ 4mm (Match Grade) or 6.5mm'},
-  {name:'Cape Buffalo', examples:'Cape Buffalo', min:80, badgeClass:'buffalo', arrow:'Easton Dangerous Game (5mm FMJ, 250 spine)'}
+  {name:'Small Game', examples:'Bushbuck, Duiker, Klipspringer, Rabbit', min:25, badgeClass:'small-game',
+   arrowTitle:'6.5mm Bowhunter or 5mm FMJ',
+   arrowDesc:'Lighter GPI shafts tuned for thin-skinned, small-bodied game. Prioritizes speed and flat trajectory over raw penetration.'},
+  {name:'Medium Game', examples:'Whitetail, Mule Deer, Pronghorn Antelope, Bighorn Sheep, Impala, Warthog', min:40, badgeClass:'medium-game',
+   arrowTitle:'5mm Axis or 6.5mm Hunter Classic',
+   arrowDesc:'Easton\u2019s all-around standard hunting shaft. Proven on everything from mule deer to bighorn sheep with excellent accuracy and moderate FOC.'},
+  {name:'Large Game', examples:'Elk, Black Bear, Wild Boar, Nyala', min:50, badgeClass:'large-game',
+   arrowTitle:'5mm Axis 260 Match Grade or 4mm FMJ',
+   arrowDesc:'Stiff-spine, 11.5 GPI Axis Match Grade shaft adds mass and structural rigidity for tougher hide and bigger bone structure typical of elk and black bear.'},
+  {name:'Plains Game (Large Antelope)', examples:'Kudu, Zebra, Eland, Gemsbok, Wildebeest', min:65, badgeClass:'plains-game',
+   arrowTitle:'4mm FMJ or 5mm FMJ Max',
+   arrowDesc:'Hybrid carbon/aluminum construction for deeper penetration on tough-hided African antelope at typical plains-game ranges.'},
+  {name:'Sable / Roan', examples:'Sable Antelope, Roan Antelope', min:65, badgeClass:'large-antelope',
+   arrowTitle:'4mm FMJ or Easton 5.0',
+   arrowDesc:'Heavy-for-spine builds favored for these large, dense-boned antelope. Often built past 500 grains total for extra momentum.'},
+  {name:'Moose / Brown Bear / Grizzly', examples:'Moose, Brown Bear, Grizzly', min:65, badgeClass:'toughest-game',
+   arrowTitle:'FMJ 4mm (Match Grade) or 6.5mm',
+   arrowDesc:'Max-penetration hybrid shafts built for thick hide and heavy bone. Many hunters push total arrow weight to 500-600+ grains for this class.'},
+  {name:'Cape Buffalo', examples:'Cape Buffalo', min:80, badgeClass:'buffalo',
+   arrowTitle:'Easton Dangerous Game (5mm FMJ, 250 spine)',
+   arrowDesc:'N-FUSED carbon core wrapped in a 7075 alloy metal jacket (17.7 GPI). Easton\u2019s purpose-built shaft for the world\u2019s heaviest, thickest-skinned game. Typically built to 750-950+ grain finished arrows to meet South African legal minimums (80 lb draw weight, 80 ft-lbs KE, 750 gr arrow, two-blade cut-on-contact broadhead).'}
 ];
 
 function setMode(mode){
@@ -574,6 +752,7 @@ function calculate(){
 
   const ke = (totalGrains * speed * speed) / 450240;
   const momentum = (totalGrains * speed) / 225218;
+  lastComputedKE = ke;
 
   totalWeightEl.innerHTML = `${totalGrains.toFixed(0)}<span> gr</span>`;
   keValueEl.innerHTML = `${ke.toFixed(1)}<span> ft-lbs</span>`;
@@ -600,30 +779,63 @@ function calculate(){
     : `⚠ Below recommended minimum for Small Game (need ≥25 ft-lbs)`;
 
   ethicsBody.innerHTML = '';
-  gameThresholds.forEach(g=>{
+  gameThresholds.forEach((g, idx)=>{
     const tr = document.createElement('tr');
+    tr.setAttribute('data-idx', idx);
     const met = ke >= g.min;
     if(matched && g.name === matched.name) tr.classList.add('active');
     const dotClass = met ? 'met' : 'unmet';
-    tr.innerHTML = `<td>${g.name}</td><td class="examples">${g.examples}</td><td>${g.min} ft-lbs</td><td class="arrow-rec">${g.arrow}</td><td><div class="status-cell"><span class="status-dot ${dotClass}"></span></div></td>`;
+    tr.innerHTML = `<td class="game-name">${g.name}</td><td class="examples">${g.examples}</td><td>${g.min} ft-lbs</td><td><div class="status-cell"><span class="status-dot ${dotClass}"></span></div></td>`;
+    tr.addEventListener('click', function(){
+      openModal(idx);
+    });
     ethicsBody.appendChild(tr);
   });
 }
 
+function openModal(idx){
+  const g = gameThresholds[idx];
+  modalTitle.textContent = g.name;
+  modalExamples.textContent = g.examples;
+  modalMinKE.textContent = g.min + ' ft-lbs';
+  const met = lastComputedKE >= g.min;
+  modalYourKE.textContent = lastComputedKE.toFixed(1) + ' ft-lbs';
+  modalYourKE.style.color = met ? '#3fbf5f' : '#e0453a';
+  modalArrowTitle.textContent = g.arrowTitle;
+  modalArrowDesc.textContent = g.arrowDesc;
+  modalOverlay.classList.add('open');
+}
+
+function closeModal(){
+  modalOverlay.classList.remove('open');
+}
+
+modalCloseBtn.addEventListener('click', closeModal);
+
+modalOverlay.addEventListener('click', function(event){
+  if(event.target === modalOverlay){
+    closeModal();
+  }
+});
+
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape') closeModal();
+});
+
 function resetDefaults(){
   drawWeightEl.value = 75;
-  speedEl.value = 285;
-  arrowLengthEl.value = 29;
-  arrowWeightEl.value = 350;
-  hardwareWeightEl.value = 25;
-  headWeightSelect.value = '125';
-  headWeightCustom.value = 125;
+  speedEl.value = 289;
+  arrowLengthEl.value = 29.5;
+  arrowWeightEl.value = 388;
+  hardwareWeightEl.value = 50;
+  headWeightSelect.value = '100';
+  headWeightCustom.value = 100;
   headWeightCustom.style.display = 'none';
 
-  arrowLengthTotalEl.value = 29;
-  totalArrowWeightInput.value = 500;
-  headWeightSelectTotal.value = '125';
-  headWeightCustomTotal.value = 125;
+  arrowLengthTotalEl.value = 29.5;
+  totalArrowWeightInput.value = 538;
+  headWeightSelectTotal.value = '100';
+  headWeightCustomTotal.value = 100;
   headWeightCustomTotal.style.display = 'none';
 
   setMode('component');
