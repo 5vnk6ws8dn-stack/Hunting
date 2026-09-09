@@ -27,7 +27,7 @@
     padding:24px 16px 60px;
   }
   .wrap{
-    max-width:1000px;
+    max-width:1100px;
     margin:0 auto;
   }
   header{
@@ -241,16 +241,21 @@
     margin-top:8px;
     line-height:1.4;
   }
-  .ethics-table{
+  .ethics-table-wrap{
+    overflow-x:auto;
     margin-top:22px;
+  }
+  .ethics-table{
     width:100%;
     border-collapse:collapse;
     font-size:0.85rem;
+    min-width:860px;
   }
   .ethics-table th, .ethics-table td{
     padding:9px 10px;
     text-align:left;
     border-bottom:1px solid var(--border);
+    vertical-align:top;
   }
   .ethics-table th{
     color:var(--text-dim);
@@ -265,6 +270,11 @@
   .ethics-table td.examples{
     color:#6c8577;
     font-size:0.78rem;
+  }
+  .ethics-table td.arrow-rec{
+    color:#bfae8e;
+    font-size:0.8rem;
+    font-weight:500;
   }
   footer{
     text-align:center;
@@ -412,13 +422,15 @@
       <div class="foc-note">FOC is estimated assuming an evenly-distributed shaft with the broadhead/point mass concentrated at the tip.</div>
     </div>
 
-    <table class="ethics-table">
-      <thead>
-        <tr><th>Game Class</th><th>Examples</th><th>Min. KE</th><th>Status</th></tr>
-      </thead>
-      <tbody id="ethicsBody">
-      </tbody>
-    </table>
+    <div class="ethics-table-wrap">
+      <table class="ethics-table">
+        <thead>
+          <tr><th>Game Class</th><th>Examples</th><th>Min. KE</th><th>Recommended Easton Arrow</th><th>Status</th></tr>
+        </thead>
+        <tbody id="ethicsBody">
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <footer>
@@ -428,8 +440,10 @@
     Bighorn Sheep and Pronghorn Antelope are thin-skinned, deer-class animals and sit in the Medium Game tier — they do not require 65 ft-lb "toughest game" energy levels.
     Elk sits in the Large Game tier (42-65 ft-lbs); many hunters target the upper half of that range (55-65 ft-lbs) for margin, but Elk is not classified in the 65+ tier by itself.
     Sable and Roan are large-bodied, tough antelope commonly held to the same 65 ft-lb large-game floor as Kudu, Zebra, Eland, Gemsbok, and Wildebeest.
-    Cape Buffalo reflects the South African legal minimum (80 lb draw weight, 80 ft-lbs KE, 700 gr arrow).<br>
-    Always confirm current law and your specific outfitter/PH requirements before a hunt — regulations and recommendations vary by species, location, and season.
+    Cape Buffalo reflects the South African legal minimum (80 lb draw weight, 80 ft-lbs KE, 750 gr minimum arrow weight, two-blade cut-on-contact broadhead required).<br>
+    Arrow recommendations are based on Easton's current hunting lineup (Axis, FMJ, 6.5mm, Dangerous Game, Easton 5.0) matched by grains-per-inch and penetration design to typical hide/bone toughness for each class.
+    The Easton 5mm FMJ Dangerous Game (250 spine, 17.7 GPI, N-FUSED carbon core with 7075 alloy metal jacket) is Easton's dedicated shaft for Cape Buffalo and other thick-skinned dangerous game — real-world hunters typically build it out to 750-950+ grain finished arrows to meet legal and penetration requirements.<br>
+    Always verify spine selection with Easton's arrow selector for your specific draw weight and length, and confirm current law and your specific outfitter/PH requirements before a hunt — regulations vary by species, location, and season.
     Always verify actual arrow speed with a chronograph — calculated IBO speeds are optimistic.
   </footer>
 </div>
@@ -465,16 +479,18 @@ const componentFields = document.getElementById('componentFields');
 const totalFields = document.getElementById('totalFields');
 
 // Game thresholds per Easton/IBO published ranges plus South African / Namibian
-// legal bowhunting minimums. Animal names capitalized for a professional,
-// proper-noun style presentation throughout the table.
+// legal bowhunting minimums. Arrow recommendations map Easton's current hunting
+// lineup (by GPI/construction) to the hide/bone toughness typical of each class.
+// Cape Buffalo -> Easton Dangerous Game (5mm FMJ, 250 spine, 17.7 GPI): Easton's
+// purpose-built shaft for the world's heaviest, thickest-skinned game.
 const gameThresholds = [
-  {name:'Small Game', examples:'Bushbuck, Duiker, Klipspringer, Rabbit', min:25, badgeClass:'small-game'},
-  {name:'Medium Game', examples:'Whitetail, Mule Deer, Pronghorn Antelope, Bighorn Sheep, Impala, Warthog', min:40, badgeClass:'medium-game'},
-  {name:'Large Game', examples:'Elk, Black Bear, Wild Boar, Nyala', min:50, badgeClass:'large-game'},
-  {name:'Plains Game (Large Antelope)', examples:'Kudu, Zebra, Eland, Gemsbok, Wildebeest', min:65, badgeClass:'plains-game'},
-  {name:'Sable / Roan', examples:'Sable Antelope, Roan Antelope', min:65, badgeClass:'large-antelope'},
-  {name:'Moose / Brown Bear / Grizzly', examples:'Moose, Brown Bear, Grizzly', min:65, badgeClass:'toughest-game'},
-  {name:'Cape Buffalo', examples:'Cape Buffalo', min:80, badgeClass:'buffalo'}
+  {name:'Small Game', examples:'Bushbuck, Duiker, Klipspringer, Rabbit', min:25, badgeClass:'small-game', arrow:'6.5mm Bowhunter or 5mm FMJ'},
+  {name:'Medium Game', examples:'Whitetail, Mule Deer, Pronghorn Antelope, Bighorn Sheep, Impala, Warthog', min:40, badgeClass:'medium-game', arrow:'5mm Axis or 6.5mm Hunter Classic'},
+  {name:'Large Game', examples:'Elk, Black Bear, Wild Boar, Nyala', min:50, badgeClass:'large-game', arrow:'5mm Axis (heavy spine) or 4mm FMJ'},
+  {name:'Plains Game (Large Antelope)', examples:'Kudu, Zebra, Eland, Gemsbok, Wildebeest', min:65, badgeClass:'plains-game', arrow:'4mm FMJ or 5mm FMJ Max'},
+  {name:'Sable / Roan', examples:'Sable Antelope, Roan Antelope', min:65, badgeClass:'large-antelope', arrow:'4mm FMJ or Easton 5.0'},
+  {name:'Moose / Brown Bear / Grizzly', examples:'Moose, Brown Bear, Grizzly', min:65, badgeClass:'toughest-game', arrow:'FMJ 4mm (Match Grade) or 6.5mm'},
+  {name:'Cape Buffalo', examples:'Cape Buffalo', min:80, badgeClass:'buffalo', arrow:'Easton Dangerous Game (5mm FMJ, 250 spine)'}
 ];
 
 function setMode(mode){
@@ -569,7 +585,7 @@ function calculate(){
     const tr = document.createElement('tr');
     const met = ke >= g.min;
     if(matched && g.name === matched.name) tr.classList.add('active');
-    tr.innerHTML = `<td>${g.name}</td><td class="examples">${g.examples}</td><td>${g.min} ft-lbs</td><td style="color:${met ? '#7fae6c' : '#c9573f'};font-weight:600;">${met ? 'Meets Minimum' : 'Below Minimum'}</td>`;
+    tr.innerHTML = `<td>${g.name}</td><td class="examples">${g.examples}</td><td>${g.min} ft-lbs</td><td class="arrow-rec">${g.arrow}</td><td style="color:${met ? '#7fae6c' : '#c9573f'};font-weight:600;">${met ? 'Meets Minimum' : 'Below Minimum'}</td>`;
     ethicsBody.appendChild(tr);
   });
 }
