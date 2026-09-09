@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compound Bow Kinetic Energy Calculator</title>
+<style>
+  :root{
+    --bg:#0f1712;
+    --panel:#182620;
+    --panel-2:#1d2e26;
+    --accent:#c98a3f;
+    --accent-2:#7fae6c;
+    --text:#eae4d8;
+    --text-dim:#9fb0a5;
+    --border:#2c3f34;
+    --danger:#c9573f;
+    --ok:#7fae6c;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI',Roboto,Arial,sans-serif;
+    background:linear-gradient(160deg,var(--bg),#0b110d);
+    color:var(--text);
+    min-height:100vh;
+    padding:24px 16px 60px;
+  }
+  .wrap{
+    max-width:1000px;
+    margin:0 auto;
+  }
+  header{
+    text-align:center;
+    margin-bottom:28px;
+  }
+  header h1{
+    font-size:1.9rem;
+    margin:0 0 6px;
+    color:var(--text);
+    letter-spacing:0.5px;
+  }
+  header p{
+    color:var(--text-dim);
+    margin:0;
+    font-size:0.95rem;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+  }
+  @media (max-width:760px){
+    .grid{grid-template-columns:1fr;}
+  }
+  .card{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:22px 24px;
+    box-shadow:0 4px 18px rgba(0,0,0,0.35);
+  }
+  .card h2{
+    font-size:1.05rem;
+    margin:0 0 16px;
+    color:var(--accent);
+    border-bottom:1px solid var(--border);
+    padding-bottom:10px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .field{
+    margin-bottom:16px;
+  }
+  label{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    font-size:0.85rem;
+    color:var(--text-dim);
+    margin-bottom:6px;
+  }
+  label .unit{
+    color:#6c8577;
+    font-size:0.78rem;
+  }
+  input[type="number"], select{
+    width:100%;
+    padding:11px 12px;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:8px;
+    color:var(--text);
+    font-size:1rem;
+    outline:none;
+    transition:border-color .15s;
+    font-family:inherit;
+  }
+  input[type="number"]:focus, select:focus{
+    border-color:var(--accent);
+  }
+  select{
+    cursor:pointer;
+  }
+  .hint{
+    font-size:0.75rem;
+    color:#6c8577;
+    margin-top:5px;
+    line-height:1.4;
+  }
+  .row-inline{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+  .mode-toggle{
+    display:flex;
+    gap:8px;
+    margin-bottom:18px;
+    background:var(--panel-2);
+    border-radius:10px;
+    padding:4px;
+    border:1px solid var(--border);
+  }
+  .mode-btn{
+    flex:1;
+    padding:9px 10px;
+    text-align:center;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:0.82rem;
+    color:var(--text-dim);
+    transition:all .15s;
+    border:none;
+    background:transparent;
+    font-family:inherit;
+  }
+  .mode-btn.active{
+    background:var(--accent);
+    color:#1a1208;
+    font-weight:600;
+  }
+  .component-fields, .total-fields{
+    display:none;
+  }
+  .component-fields.visible, .total-fields.visible{
+    display:block;
+  }
+  .results{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:22px 24px;
+    margin-top:20px;
+  }
+  .results h2{
+    font-size:1.05rem;
+    margin:0 0 16px;
+    color:var(--accent);
+    border-bottom:1px solid var(--border);
+    padding-bottom:10px;
+  }
+  .result-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:16px;
+  }
+  @media (max-width:760px){
+    .result-grid{grid-template-columns:1fr;}
+  }
+  .stat{
+    background:var(--panel-2);
+    border-radius:10px;
+    padding:16px;
+    text-align:center;
+    border:1px solid var(--border);
+  }
+  .stat .label{
+    font-size:0.78rem;
+    color:var(--text-dim);
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    margin-bottom:8px;
+  }
+  .stat .value{
+    font-size:1.7rem;
+    font-weight:700;
+    color:var(--text);
+  }
+  .stat .value span{
+    font-size:1rem;
+    color:var(--text-dim);
+    font-weight:400;
+  }
+  .badge{
+    display:inline-block;
+    margin-top:10px;
+    padding:4px 12px;
+    border-radius:20px;
+    font-size:0.78rem;
+    font-weight:600;
+  }
+  .badge.small-game{background:rgba(127,174,108,0.15);color:var(--ok);border:1px solid var(--ok);}
+  .badge.medium-game{background:rgba(201,138,63,0.15);color:var(--accent);border:1px solid var(--accent);}
+  .badge.large-game{background:rgba(201,138,63,0.25);color:#e0a860;border:1px solid #e0a860;}
+  .badge.plains-game{background:rgba(201,138,63,0.3);color:#e0a860;border:1px solid #e0a860;}
+  .badge.large-antelope{background:rgba(201,120,63,0.3);color:#e0a860;border:1px solid #e0a860;}
+  .badge.toughest-game{background:rgba(201,87,63,0.22);color:var(--danger);border:1px solid var(--danger);}
+  .badge.buffalo{background:rgba(150,40,30,0.3);color:#ff8a6e;border:1px solid #ff8a6e;}
+  .foc-bar{
+    margin-top:18px;
+    padding-top:16px;
+    border-top:1px solid var(--border);
+  }
+  .foc-track{
+    position:relative;
+    height:10px;
+    background:var(--panel-2);
+    border-radius:6px;
+    margin-top:10px;
+    overflow:hidden;
+  }
+  .foc-fill{
+    position:absolute;
+    top:0;left:0;bottom:0;
+    background:linear-gradient(90deg,var(--accent-2),var(--accent));
+    border-radius:6px;
+    transition:width .3s ease;
+  }
+  .foc-labels{
+    display:flex;
+    justify-content:space-between;
+    font-size:0.72rem;
+    color:#6c8577;
+    margin-top:4px;
+  }
+  .foc-note{
+    font-size:0.75rem;
+    color:#6c8577;
+    margin-top:8px;
+    line-height:1.4;
+  }
+  .ethics-table{
+    margin-top:22px;
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.85rem;
+  }
+  .ethics-table th, .ethics-table td{
+    padding:9px 10px;
+    text-align:left;
+    border-bottom:1px solid var(--border);
+  }
+  .ethics-table th{
+    color:var(--text-dim);
+    font-weight:600;
+    font-size:0.78rem;
+    text-transform:uppercase;
+    letter-spacing:0.4px;
+  }
+  .ethics-table tr.active{
+    background:rgba(201,138,63,0.1);
+  }
+  .ethics-table td.examples{
+    color:#6c8577;
+    font-size:0.78rem;
+  }
+  footer{
+    text-align:center;
+    color:#5c7263;
+    font-size:0.78rem;
+    margin-top:34px;
+    line-height:1.6;
+  }
+  .btn-reset{
+    margin-top:6px;
+    width:100%;
+    padding:10px;
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text-dim);
+    border-radius:8px;
+    cursor:pointer;
+    font-size:0.85rem;
+    transition:all .15s;
+    font-family:inherit;
+  }
+  .btn-reset:hover{
+    border-color:var(--accent);
+    color:var(--accent);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🏹 Compound Bow Kinetic Energy Calculator</h1>
+    <p>Estimate arrow KE, momentum, and FOC for hunting setups — from small game to Cape Buffalo.</p>
+  </header>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Bow Setup</h2>
+      <div class="field">
+        <label>Draw weight <span class="unit">lbs</span></label>
+        <input type="number" id="drawWeight" value="75" min="1" step="0.5">
+        <div class="hint">Peak draw weight of the bow (used for reference only — actual KE comes from measured arrow speed).</div>
+      </div>
+      <div class="field">
+        <label>Arrow speed (chronographed) <span class="unit">fps</span></label>
+        <input type="number" id="speed" value="285" min="1" step="1">
+        <div class="hint">Use your actual chronograph reading with this exact arrow — bow-rated IBO speed will overstate real performance.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Arrow Build</h2>
+
+      <div class="mode-toggle">
+        <button class="mode-btn active" id="modeComponentBtn" onclick="setMode('component')">Enter by component</button>
+        <button class="mode-btn" id="modeTotalBtn" onclick="setMode('total')">Enter total weight</button>
+      </div>
+
+      <div class="component-fields visible" id="componentFields">
+        <div class="field">
+          <label>Arrow length <span class="unit">inches</span></label>
+          <input type="number" id="arrowLength" value="29" min="1" step="0.25">
+        </div>
+        <div class="row-inline">
+          <div class="field">
+            <label>Shaft weight <span class="unit">grains</span></label>
+            <input type="number" id="arrowWeight" value="350" min="1" step="1">
+            <div class="hint" style="margin-top:5px;">Bare shaft only (no point/insert).</div>
+          </div>
+          <div class="field">
+            <label>Insert + nock + vanes <span class="unit">grains</span></label>
+            <input type="number" id="hardwareWeight" value="25" min="0" step="1">
+            <div class="hint" style="margin-top:5px;">Optional — leave 0 to ignore.</div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Broadhead / point weight <span class="unit">grains</span></label>
+          <select id="headWeightSelect">
+            <option value="100">100 gr</option>
+            <option value="125" selected>125 gr</option>
+            <option value="200">200 gr</option>
+            <option value="custom">Custom…</option>
+          </select>
+          <input type="number" id="headWeightCustom" value="125" min="0" step="1" style="margin-top:8px;display:none;" placeholder="Enter custom broadhead weight (grains)">
+        </div>
+      </div>
+
+      <div class="total-fields" id="totalFields">
+        <div class="field">
+          <label>Arrow length <span class="unit">inches</span></label>
+          <input type="number" id="arrowLengthTotal" value="29" min="1" step="0.25">
+        </div>
+        <div class="field">
+          <label>Total arrow weight (includes broadhead + insert) <span class="unit">grains</span></label>
+          <input type="number" id="totalArrowWeightInput" value="500" min="1" step="1">
+          <div class="hint">Fully assembled, finished arrow weight — shaft, insert, nock, vanes, and broadhead all included.</div>
+        </div>
+        <div class="field">
+          <label>Broadhead / point weight <span class="unit">grains</span></label>
+          <select id="headWeightSelectTotal">
+            <option value="100">100 gr</option>
+            <option value="125" selected>125 gr</option>
+            <option value="200">200 gr</option>
+            <option value="custom">Custom…</option>
+          </select>
+          <input type="number" id="headWeightCustomTotal" value="125" min="0" step="1" style="margin-top:8px;display:none;" placeholder="Enter custom broadhead weight (grains)">
+          <div class="hint">Used only to estimate FOC — subtracted from total to infer shaft+hardware weight.</div>
+        </div>
+      </div>
+
+      <button class="btn-reset" onclick="resetDefaults()">Reset to example values</button>
+    </div>
+  </div>
+
+  <div class="results">
+    <h2>Results</h2>
+    <div class="result-grid">
+      <div class="stat">
+        <div class="label">Total Arrow Weight</div>
+        <div class="value" id="totalWeight">0<span> gr</span></div>
+      </div>
+      <div class="stat">
+        <div class="label">Kinetic Energy</div>
+        <div class="value" id="keValue">0<span> ft-lbs</span></div>
+      </div>
+      <div class="stat">
+        <div class="label">Momentum</div>
+        <div class="value" id="momentumValue">0<span> slug-ft/s</span></div>
+      </div>
+    </div>
+
+    <div style="text-align:center;">
+      <span class="badge" id="gameBadge">—</span>
+    </div>
+
+    <div class="foc-bar">
+      <label style="margin-bottom:0;">Front of Center (FOC) <span class="unit" id="focPercent">—</span></label>
+      <div class="foc-track">
+        <div class="foc-fill" id="focFill" style="width:0%;"></div>
+      </div>
+      <div class="foc-labels">
+        <span>0% Low</span>
+        <span>10-15% Standard</span>
+        <span>20%+ High FOC</span>
+      </div>
+      <div class="foc-note">FOC is estimated assuming an evenly-distributed shaft with the broadhead/point mass concentrated at the tip.</div>
+    </div>
+
+    <table class="ethics-table">
+      <thead>
+        <tr><th>Game Class</th><th>Examples</th><th>Min. KE</th><th>Status</th></tr>
+      </thead>
+      <tbody id="ethicsBody">
+      </tbody>
+    </table>
+  </div>
+
+  <footer>
+    KE = (arrow weight in grains × velocity² in fps) ÷ 450,240 &nbsp;|&nbsp;
+    Momentum = (arrow weight in grains × velocity in fps) ÷ 225,218<br>
+    Thresholds reflect Easton/IBO published ranges plus South African/Namibian legal bowhunting minimums for African species.
+    Bighorn Sheep and Pronghorn Antelope are thin-skinned, deer-class animals and sit in the Medium Game tier — they do not require 65 ft-lb "toughest game" energy levels.
+    Elk sits in the Large Game tier (42-65 ft-lbs); many hunters target the upper half of that range (55-65 ft-lbs) for margin, but Elk is not classified in the 65+ tier by itself.
+    Sable and Roan are large-bodied, tough antelope commonly held to the same 65 ft-lb large-game floor as Kudu, Zebra, Eland, Gemsbok, and Wildebeest.
+    Cape Buffalo reflects the South African legal minimum (80 lb draw weight, 80 ft-lbs KE, 700 gr arrow).<br>
+    Always confirm current law and your specific outfitter/PH requirements before a hunt — regulations and recommendations vary by species, location, and season.
+    Always verify actual arrow speed with a chronograph — calculated IBO speeds are optimistic.
+  </footer>
+</div>
+
+<script>
+let currentMode = 'component';
+
+const drawWeightEl = document.getElementById('drawWeight');
+const speedEl = document.getElementById('speed');
+
+const arrowLengthEl = document.getElementById('arrowLength');
+const arrowWeightEl = document.getElementById('arrowWeight');
+const hardwareWeightEl = document.getElementById('hardwareWeight');
+const headWeightSelect = document.getElementById('headWeightSelect');
+const headWeightCustom = document.getElementById('headWeightCustom');
+
+const arrowLengthTotalEl = document.getElementById('arrowLengthTotal');
+const totalArrowWeightInput = document.getElementById('totalArrowWeightInput');
+const headWeightSelectTotal = document.getElementById('headWeightSelectTotal');
+const headWeightCustomTotal = document.getElementById('headWeightCustomTotal');
+
+const totalWeightEl = document.getElementById('totalWeight');
+const keValueEl = document.getElementById('keValue');
+const momentumValueEl = document.getElementById('momentumValue');
+const gameBadgeEl = document.getElementById('gameBadge');
+const focFillEl = document.getElementById('focFill');
+const focPercentEl = document.getElementById('focPercent');
+const ethicsBody = document.getElementById('ethicsBody');
+
+const modeComponentBtn = document.getElementById('modeComponentBtn');
+const modeTotalBtn = document.getElementById('modeTotalBtn');
+const componentFields = document.getElementById('componentFields');
+const totalFields = document.getElementById('totalFields');
+
+// Game thresholds per Easton/IBO published ranges plus South African / Namibian
+// legal bowhunting minimums. Animal names capitalized for a professional,
+// proper-noun style presentation throughout the table.
+const gameThresholds = [
+  {name:'Small Game', examples:'Bushbuck, Duiker, Klipspringer, Rabbit', min:25, badgeClass:'small-game'},
+  {name:'Medium Game', examples:'Whitetail, Mule Deer, Pronghorn Antelope, Bighorn Sheep, Impala, Warthog', min:40, badgeClass:'medium-game'},
+  {name:'Large Game', examples:'Elk, Black Bear, Wild Boar, Nyala', min:50, badgeClass:'large-game'},
+  {name:'Plains Game (Large Antelope)', examples:'Kudu, Zebra, Eland, Gemsbok, Wildebeest', min:65, badgeClass:'plains-game'},
+  {name:'Sable / Roan', examples:'Sable Antelope, Roan Antelope', min:65, badgeClass:'large-antelope'},
+  {name:'Moose / Brown Bear / Grizzly', examples:'Moose, Brown Bear, Grizzly', min:65, badgeClass:'toughest-game'},
+  {name:'Cape Buffalo', examples:'Cape Buffalo', min:80, badgeClass:'buffalo'}
+];
+
+function setMode(mode){
+  currentMode = mode;
+  if(mode === 'component'){
+    modeComponentBtn.classList.add('active');
+    modeTotalBtn.classList.remove('active');
+    componentFields.classList.add('visible');
+    totalFields.classList.remove('visible');
+  } else {
+    modeTotalBtn.classList.add('active');
+    modeComponentBtn.classList.remove('active');
+    totalFields.classList.add('visible');
+    componentFields.classList.remove('visible');
+  }
+  calculate();
+}
+
+function getHeadWeight(selectEl, customEl){
+  if(selectEl.value === 'custom'){
+    return parseFloat(customEl.value) || 0;
+  }
+  return parseFloat(selectEl.value) || 0;
+}
+
+function bindHeadSelect(selectEl, customEl){
+  selectEl.addEventListener('change', ()=>{
+    if(selectEl.value === 'custom'){
+      customEl.style.display = 'block';
+    } else {
+      customEl.style.display = 'none';
+      customEl.value = selectEl.value;
+    }
+    calculate();
+  });
+  customEl.addEventListener('input', calculate);
+}
+
+bindHeadSelect(headWeightSelect, headWeightCustom);
+bindHeadSelect(headWeightSelectTotal, headWeightCustomTotal);
+
+function calculate(){
+  const speed = parseFloat(speedEl.value) || 0;
+  let totalGrains = 0;
+  let arrowLength = 0;
+  let headWeight = 0;
+  let shaftPlusHardware = 0;
+
+  if(currentMode === 'component'){
+    const arrowWeight = parseFloat(arrowWeightEl.value) || 0;
+    const hardwareWeight = parseFloat(hardwareWeightEl.value) || 0;
+    headWeight = getHeadWeight(headWeightSelect, headWeightCustom);
+    arrowLength = parseFloat(arrowLengthEl.value) || 0;
+    shaftPlusHardware = arrowWeight + hardwareWeight;
+    totalGrains = shaftPlusHardware + headWeight;
+  } else {
+    totalGrains = parseFloat(totalArrowWeightInput.value) || 0;
+    headWeight = getHeadWeight(headWeightSelectTotal, headWeightCustomTotal);
+    arrowLength = parseFloat(arrowLengthTotalEl.value) || 0;
+    shaftPlusHardware = Math.max(0, totalGrains - headWeight);
+  }
+
+  const ke = (totalGrains * speed * speed) / 450240;
+  const momentum = (totalGrains * speed) / 225218;
+
+  totalWeightEl.innerHTML = `${totalGrains.toFixed(0)}<span> gr</span>`;
+  keValueEl.innerHTML = `${ke.toFixed(1)}<span> ft-lbs</span>`;
+  momentumValueEl.innerHTML = `${momentum.toFixed(3)}<span> slug-ft/s</span>`;
+
+  let focPct = 0;
+  if(arrowLength > 0 && totalGrains > 0){
+    const shaftCenter = arrowLength / 2;
+    const balancePoint = ((shaftPlusHardware * shaftCenter) + (headWeight * arrowLength)) / totalGrains;
+    const physicalCenter = arrowLength / 2;
+    focPct = ((balancePoint - physicalCenter) / arrowLength) * 100;
+  }
+  focPct = Math.max(0, Math.min(35, focPct));
+  focFillEl.style.width = `${(focPct/35)*100}%`;
+  focPercentEl.textContent = `${focPct.toFixed(1)}%`;
+
+  let matched = null;
+  for(const g of gameThresholds){
+    if(ke >= g.min) matched = g;
+  }
+  gameBadgeEl.className = 'badge' + (matched ? ' ' + matched.badgeClass : '');
+  gameBadgeEl.textContent = matched
+    ? `✓ Sufficient KE for ${matched.name} (${ke.toFixed(1)} ft-lbs)`
+    : `⚠ Below recommended minimum for Small Game (need ≥25 ft-lbs)`;
+
+  ethicsBody.innerHTML = '';
+  gameThresholds.forEach(g=>{
+    const tr = document.createElement('tr');
+    const met = ke >= g.min;
+    if(matched && g.name === matched.name) tr.classList.add('active');
+    tr.innerHTML = `<td>${g.name}</td><td class="examples">${g.examples}</td><td>${g.min} ft-lbs</td><td style="color:${met ? '#7fae6c' : '#c9573f'};font-weight:600;">${met ? 'Meets Minimum' : 'Below Minimum'}</td>`;
+    ethicsBody.appendChild(tr);
+  });
+}
+
+function resetDefaults(){
+  drawWeightEl.value = 75;
+  speedEl.value = 285;
+  arrowLengthEl.value = 29;
+  arrowWeightEl.value = 350;
+  hardwareWeightEl.value = 25;
+  headWeightSelect.value = '125';
+  headWeightCustom.value = 125;
+  headWeightCustom.style.display = 'none';
+
+  arrowLengthTotalEl.value = 29;
+  totalArrowWeightInput.value = 500;
+  headWeightSelectTotal.value = '125';
+  headWeightCustomTotal.value = 125;
+  headWeightCustomTotal.style.display = 'none';
+
+  setMode('component');
+}
+
+[drawWeightEl, speedEl, arrowLengthEl, arrowWeightEl, hardwareWeightEl,
+ arrowLengthTotalEl, totalArrowWeightInput].forEach(el=>{
+  el.addEventListener('input', calculate);
+});
+
+calculate();
+</script>
+</body>
+</html>
