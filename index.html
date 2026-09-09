@@ -6,22 +6,22 @@
 <title>Compound Bow Kinetic Energy Calculator</title>
 <style>
   :root{
-    --bg:#0f1712;
-    --panel:#182620;
-    --panel-2:#1d2e26;
+    --bg:#000000;
+    --panel:#141414;
+    --panel-2:#1c1c1c;
     --accent:#c98a3f;
     --accent-2:#7fae6c;
     --text:#eae4d8;
     --text-dim:#9fb0a5;
-    --border:#2c3f34;
-    --danger:#c9573f;
-    --ok:#7fae6c;
+    --border:#2b2b2b;
+    --danger:#e0453a;
+    --ok:#3fbf5f;
   }
   *{box-sizing:border-box;}
   body{
     margin:0;
     font-family:'Segoe UI',Roboto,Arial,sans-serif;
-    background:linear-gradient(160deg,var(--bg),#0b110d);
+    background:#000000;
     color:var(--text);
     min-height:100vh;
     padding:24px 16px 60px;
@@ -58,7 +58,7 @@
     border:1px solid var(--border);
     border-radius:14px;
     padding:22px 24px;
-    box-shadow:0 4px 18px rgba(0,0,0,0.35);
+    box-shadow:0 4px 18px rgba(0,0,0,0.6);
   }
   .card h2{
     font-size:1.05rem;
@@ -82,7 +82,7 @@
     margin-bottom:6px;
   }
   label .unit{
-    color:#6c8577;
+    color:#6c7570;
     font-size:0.78rem;
   }
   input[type="number"], select{
@@ -105,7 +105,7 @@
   }
   .hint{
     font-size:0.75rem;
-    color:#6c8577;
+    color:#6c7570;
     margin-top:5px;
     line-height:1.4;
   }
@@ -201,13 +201,13 @@
     font-size:0.78rem;
     font-weight:600;
   }
-  .badge.small-game{background:rgba(127,174,108,0.15);color:var(--ok);border:1px solid var(--ok);}
+  .badge.small-game{background:rgba(63,191,95,0.15);color:var(--ok);border:1px solid var(--ok);}
   .badge.medium-game{background:rgba(201,138,63,0.15);color:var(--accent);border:1px solid var(--accent);}
   .badge.large-game{background:rgba(201,138,63,0.25);color:#e0a860;border:1px solid #e0a860;}
   .badge.plains-game{background:rgba(201,138,63,0.3);color:#e0a860;border:1px solid #e0a860;}
   .badge.large-antelope{background:rgba(201,120,63,0.3);color:#e0a860;border:1px solid #e0a860;}
-  .badge.toughest-game{background:rgba(201,87,63,0.22);color:var(--danger);border:1px solid var(--danger);}
-  .badge.buffalo{background:rgba(150,40,30,0.3);color:#ff8a6e;border:1px solid #ff8a6e;}
+  .badge.toughest-game{background:rgba(224,69,58,0.18);color:var(--danger);border:1px solid var(--danger);}
+  .badge.buffalo{background:rgba(150,30,25,0.3);color:#ff8a6e;border:1px solid #ff8a6e;}
   .foc-bar{
     margin-top:18px;
     padding-top:16px;
@@ -232,12 +232,12 @@
     display:flex;
     justify-content:space-between;
     font-size:0.72rem;
-    color:#6c8577;
+    color:#6c7570;
     margin-top:4px;
   }
   .foc-note{
     font-size:0.75rem;
-    color:#6c8577;
+    color:#6c7570;
     margin-top:8px;
     line-height:1.4;
   }
@@ -249,7 +249,7 @@
     width:100%;
     border-collapse:collapse;
     font-size:0.85rem;
-    min-width:860px;
+    min-width:820px;
   }
   .ethics-table th, .ethics-table td{
     padding:9px 10px;
@@ -265,10 +265,10 @@
     letter-spacing:0.4px;
   }
   .ethics-table tr.active{
-    background:rgba(201,138,63,0.1);
+    background:rgba(201,138,63,0.08);
   }
   .ethics-table td.examples{
-    color:#6c8577;
+    color:#6c7570;
     font-size:0.78rem;
   }
   .ethics-table td.arrow-rec{
@@ -276,9 +276,29 @@
     font-size:0.8rem;
     font-weight:500;
   }
+  .status-cell{
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .status-dot{
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    flex-shrink:0;
+    box-shadow:0 0 6px currentColor;
+  }
+  .status-dot.met{
+    background:var(--ok);
+    color:var(--ok);
+  }
+  .status-dot.unmet{
+    background:var(--danger);
+    color:var(--danger);
+  }
   footer{
     text-align:center;
-    color:#5c7263;
+    color:#57605a;
     font-size:0.78rem;
     margin-top:34px;
     line-height:1.6;
@@ -443,6 +463,7 @@
     Cape Buffalo reflects the South African legal minimum (80 lb draw weight, 80 ft-lbs KE, 750 gr minimum arrow weight, two-blade cut-on-contact broadhead required).<br>
     Arrow recommendations are based on Easton's current hunting lineup (Axis, FMJ, 6.5mm, Dangerous Game, Easton 5.0) matched by grains-per-inch and penetration design to typical hide/bone toughness for each class.
     The Easton 5mm FMJ Dangerous Game (250 spine, 17.7 GPI, N-FUSED carbon core with 7075 alloy metal jacket) is Easton's dedicated shaft for Cape Buffalo and other thick-skinned dangerous game — real-world hunters typically build it out to 750-950+ grain finished arrows to meet legal and penetration requirements.<br>
+    Green indicates your current setup meets or exceeds that game class's minimum KE; red indicates it falls short.
     Always verify spine selection with Easton's arrow selector for your specific draw weight and length, and confirm current law and your specific outfitter/PH requirements before a hunt — regulations vary by species, location, and season.
     Always verify actual arrow speed with a chronograph — calculated IBO speeds are optimistic.
   </footer>
@@ -481,8 +502,6 @@ const totalFields = document.getElementById('totalFields');
 // Game thresholds per Easton/IBO published ranges plus South African / Namibian
 // legal bowhunting minimums. Arrow recommendations map Easton's current hunting
 // lineup (by GPI/construction) to the hide/bone toughness typical of each class.
-// Cape Buffalo -> Easton Dangerous Game (5mm FMJ, 250 spine, 17.7 GPI): Easton's
-// purpose-built shaft for the world's heaviest, thickest-skinned game.
 const gameThresholds = [
   {name:'Small Game', examples:'Bushbuck, Duiker, Klipspringer, Rabbit', min:25, badgeClass:'small-game', arrow:'6.5mm Bowhunter or 5mm FMJ'},
   {name:'Medium Game', examples:'Whitetail, Mule Deer, Pronghorn Antelope, Bighorn Sheep, Impala, Warthog', min:40, badgeClass:'medium-game', arrow:'5mm Axis or 6.5mm Hunter Classic'},
@@ -585,7 +604,8 @@ function calculate(){
     const tr = document.createElement('tr');
     const met = ke >= g.min;
     if(matched && g.name === matched.name) tr.classList.add('active');
-    tr.innerHTML = `<td>${g.name}</td><td class="examples">${g.examples}</td><td>${g.min} ft-lbs</td><td class="arrow-rec">${g.arrow}</td><td style="color:${met ? '#7fae6c' : '#c9573f'};font-weight:600;">${met ? 'Meets Minimum' : 'Below Minimum'}</td>`;
+    const dotClass = met ? 'met' : 'unmet';
+    tr.innerHTML = `<td>${g.name}</td><td class="examples">${g.examples}</td><td>${g.min} ft-lbs</td><td class="arrow-rec">${g.arrow}</td><td><div class="status-cell"><span class="status-dot ${dotClass}"></span></div></td>`;
     ethicsBody.appendChild(tr);
   });
 }
