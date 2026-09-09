@@ -27,7 +27,7 @@
     padding:24px 16px 60px;
   }
   .wrap{
-    max-width:1000px;
+    max-width:1100px;
     margin:0 auto;
   }
   header{
@@ -249,6 +249,7 @@
     width:100%;
     border-collapse:collapse;
     font-size:0.85rem;
+    min-width:820px;
   }
   .ethics-table th, .ethics-table td{
     padding:9px 10px;
@@ -270,16 +271,10 @@
     color:#6c7570;
     font-size:0.78rem;
   }
-  .game-class-link{
-    color:var(--accent);
-    cursor:pointer;
-    font-weight:600;
-    text-decoration:underline;
-    text-decoration-color:rgba(201,138,63,0.4);
-    transition:color .15s;
-  }
-  .game-class-link:hover{
-    color:#e0a860;
+  .ethics-table td.arrow-rec{
+    color:#bfae8e;
+    font-size:0.8rem;
+    font-weight:500;
   }
   .status-cell{
     display:flex;
@@ -324,91 +319,6 @@
   .btn-reset:hover{
     border-color:var(--accent);
     color:var(--accent);
-  }
-
-  .modal-overlay{
-    display:none;
-    position:fixed;
-    top:0;left:0;right:0;bottom:0;
-    background:rgba(0,0,0,0.75);
-    z-index:1000;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-  }
-  .modal-overlay.open{
-    display:flex;
-  }
-  .modal-box{
-    background:var(--panel);
-    border:1px solid var(--border);
-    border-radius:16px;
-    max-width:460px;
-    width:100%;
-    padding:26px 28px;
-    box-shadow:0 12px 40px rgba(0,0,0,0.8);
-    position:relative;
-  }
-  .modal-close{
-    position:absolute;
-    top:14px;
-    right:16px;
-    background:none;
-    border:none;
-    color:var(--text-dim);
-    font-size:1.3rem;
-    cursor:pointer;
-    line-height:1;
-  }
-  .modal-close:hover{
-    color:var(--text);
-  }
-  .modal-box h3{
-    margin:0 0 4px;
-    color:var(--accent);
-    font-size:1.15rem;
-  }
-  .modal-box .modal-examples{
-    color:#6c7570;
-    font-size:0.82rem;
-    margin-bottom:18px;
-  }
-  .modal-row{
-    display:flex;
-    justify-content:space-between;
-    padding:10px 0;
-    border-bottom:1px solid var(--border);
-    font-size:0.88rem;
-  }
-  .modal-row:last-of-type{
-    border-bottom:none;
-  }
-  .modal-row .modal-label{
-    color:var(--text-dim);
-  }
-  .modal-row .modal-value{
-    color:var(--text);
-    font-weight:600;
-    text-align:right;
-    max-width:60%;
-  }
-  .modal-arrow-name{
-    margin-top:16px;
-    background:var(--panel-2);
-    border:1px solid var(--border);
-    border-radius:10px;
-    padding:14px 16px;
-  }
-  .modal-arrow-name .arrow-title{
-    color:#bfae8e;
-    font-weight:700;
-    font-size:1rem;
-    margin-bottom:4px;
-  }
-  .modal-arrow-name .arrow-desc{
-    color:var(--text-dim);
-    font-size:0.82rem;
-    line-height:1.5;
   }
 </style>
 </head>
@@ -535,13 +445,12 @@
     <div class="ethics-table-wrap">
       <table class="ethics-table">
         <thead>
-          <tr><th>Game Class</th><th>Examples</th><th>Min. KE</th><th>Status</th></tr>
+          <tr><th>Game Class</th><th>Examples</th><th>Min. KE</th><th>Recommended Easton Arrow</th><th>Status</th></tr>
         </thead>
         <tbody id="ethicsBody">
         </tbody>
       </table>
     </div>
-    <div class="hint" style="margin-top:10px;text-align:center;">Click a game class name to see the recommended Easton arrow.</div>
   </div>
 
   <footer>
@@ -552,30 +461,12 @@
     Elk sits in the Large Game tier (42-65 ft-lbs); many hunters target the upper half of that range (55-65 ft-lbs) for margin, but Elk is not classified in the 65+ tier by itself.
     Sable and Roan are large-bodied, tough antelope commonly held to the same 65 ft-lb large-game floor as Kudu, Zebra, Eland, Gemsbok, and Wildebeest.
     Cape Buffalo reflects the South African legal minimum (80 lb draw weight, 80 ft-lbs KE, 750 gr minimum arrow weight, two-blade cut-on-contact broadhead required).<br>
+    Arrow recommendations are based on Easton's current hunting lineup (Axis, FMJ, 6.5mm, Dangerous Game, Easton 5.0) matched by grains-per-inch and penetration design to typical hide/bone toughness for each class.
+    The Easton 5mm FMJ Dangerous Game (250 spine, 17.7 GPI, N-FUSED carbon core with 7075 alloy metal jacket) is Easton's dedicated shaft for Cape Buffalo and other thick-skinned dangerous game — real-world hunters typically build it out to 750-950+ grain finished arrows to meet legal and penetration requirements.<br>
     Green indicates your current setup meets or exceeds that game class's minimum KE; red indicates it falls short.
     Always verify spine selection with Easton's arrow selector for your specific draw weight and length, and confirm current law and your specific outfitter/PH requirements before a hunt — regulations vary by species, location, and season.
     Always verify actual arrow speed with a chronograph — calculated IBO speeds are optimistic.
   </footer>
-</div>
-
-<div class="modal-overlay" id="modalOverlay" onclick="closeModalOnOverlay(event)">
-  <div class="modal-box">
-    <button class="modal-close" onclick="closeModal()">✕</button>
-    <h3 id="modalTitle">—</h3>
-    <div class="modal-examples" id="modalExamples">—</div>
-    <div class="modal-row">
-      <span class="modal-label">Minimum KE</span>
-      <span class="modal-value" id="modalMinKE">—</span>
-    </div>
-    <div class="modal-row">
-      <span class="modal-label">Your Current KE</span>
-      <span class="modal-value" id="modalYourKE">—</span>
-    </div>
-    <div class="modal-arrow-name">
-      <div class="arrow-title" id="modalArrowTitle">—</div>
-      <div class="arrow-desc" id="modalArrowDesc">—</div>
-    </div>
-  </div>
 </div>
 
 <script>
@@ -608,34 +499,17 @@ const modeTotalBtn = document.getElementById('modeTotalBtn');
 const componentFields = document.getElementById('componentFields');
 const totalFields = document.getElementById('totalFields');
 
-const modalOverlay = document.getElementById('modalOverlay');
-const modalTitle = document.getElementById('modalTitle');
-const modalExamples = document.getElementById('modalExamples');
-const modalMinKE = document.getElementById('modalMinKE');
-const modalYourKE = document.getElementById('modalYourKE');
-const modalArrowTitle = document.getElementById('modalArrowTitle');
-const modalArrowDesc = document.getElementById('modalArrowDesc');
-
-let lastComputedKE = 0;
-
 // Game thresholds per Easton/IBO published ranges plus South African / Namibian
 // legal bowhunting minimums. Arrow recommendations map Easton's current hunting
 // lineup (by GPI/construction) to the hide/bone toughness typical of each class.
 const gameThresholds = [
-  {name:'Small Game', examples:'Bushbuck, Duiker, Klipspringer, Rabbit', min:25, badgeClass:'small-game',
-   arrowTitle:'6.5mm Bowhunter or 5mm FMJ', arrowDesc:'Lighter GPI shafts tuned for thin-skinned, small-bodied game — prioritizes speed and flat trajectory over raw penetration.'},
-  {name:'Medium Game', examples:'Whitetail, Mule Deer, Pronghorn Antelope, Bighorn Sheep, Impala, Warthog', min:40, badgeClass:'medium-game',
-   arrowTitle:'5mm Axis or 6.5mm Hunter Classic', arrowDesc:'Easton\\'s all-around standard hunting shaft. Proven on everything from mule deer to bighorn sheep with excellent accuracy and moderate FOC.'},
-  {name:'Large Game', examples:'Elk, Black Bear, Wild Boar, Nyala', min:50, badgeClass:'large-game',
-   arrowTitle:'5mm Axis (heavy spine) or 4mm FMJ', arrowDesc:'Added GPI and a stiffer spine option for tougher hide and bigger bone structure typical of elk and black bear.'},
-  {name:'Plains Game (Large Antelope)', examples:'Kudu, Zebra, Eland, Gemsbok, Wildebeest', min:65, badgeClass:'plains-game',
-   arrowTitle:'4mm FMJ or 5mm FMJ Max', arrowDesc:'Hybrid carbon/aluminum construction for deeper penetration on tough-hided African antelope at typical plains-game ranges.'},
-  {name:'Sable / Roan', examples:'Sable Antelope, Roan Antelope', min:65, badgeClass:'large-antelope',
-   arrowTitle:'4mm FMJ or Easton 5.0', arrowDesc:'Heavy-for-spine builds favored for these large, dense-boned antelope — often built past 500 grains total for extra momentum.'},
-  {name:'Moose / Brown Bear / Grizzly', examples:'Moose, Brown Bear, Grizzly', min:65, badgeClass:'toughest-game',
-   arrowTitle:'FMJ 4mm (Match Grade) or 6.5mm', arrowDesc:'Max-penetration hybrid shafts built for thick hide and heavy bone. Many hunters push total arrow weight to 500-600+ grains for this class.'},
-  {name:'Cape Buffalo', examples:'Cape Buffalo', min:80, badgeClass:'buffalo',
-   arrowTitle:'Easton Dangerous Game (5mm FMJ, 250 spine)', arrowDesc:'N-FUSED carbon core wrapped in a 7075 alloy metal jacket (17.7 GPI) — Easton\\'s purpose-built shaft for the world\\'s heaviest, thickest-skinned game. Typically built to 750-950+ grain finished arrows to meet South African legal minimums (80 lb draw weight, 80 ft-lbs KE, 750 gr arrow, two-blade cut-on-contact broadhead).'}
+  {name:'Small Game', examples:'Bushbuck, Duiker, Klipspringer, Rabbit', min:25, badgeClass:'small-game', arrow:'6.5mm Bowhunter or 5mm FMJ'},
+  {name:'Medium Game', examples:'Whitetail, Mule Deer, Pronghorn Antelope, Bighorn Sheep, Impala, Warthog', min:40, badgeClass:'medium-game', arrow:'5mm Axis or 6.5mm Hunter Classic'},
+  {name:'Large Game', examples:'Elk, Black Bear, Wild Boar, Nyala', min:50, badgeClass:'large-game', arrow:'5mm Axis (heavy spine) or 4mm FMJ'},
+  {name:'Plains Game (Large Antelope)', examples:'Kudu, Zebra, Eland, Gemsbok, Wildebeest', min:65, badgeClass:'plains-game', arrow:'4mm FMJ or 5mm FMJ Max'},
+  {name:'Sable / Roan', examples:'Sable Antelope, Roan Antelope', min:65, badgeClass:'large-antelope', arrow:'4mm FMJ or Easton 5.0'},
+  {name:'Moose / Brown Bear / Grizzly', examples:'Moose, Brown Bear, Grizzly', min:65, badgeClass:'toughest-game', arrow:'FMJ 4mm (Match Grade) or 6.5mm'},
+  {name:'Cape Buffalo', examples:'Cape Buffalo', min:80, badgeClass:'buffalo', arrow:'Easton Dangerous Game (5mm FMJ, 250 spine)'}
 ];
 
 function setMode(mode){
@@ -700,7 +574,6 @@ function calculate(){
 
   const ke = (totalGrains * speed * speed) / 450240;
   const momentum = (totalGrains * speed) / 225218;
-  lastComputedKE = ke;
 
   totalWeightEl.innerHTML = `${totalGrains.toFixed(0)}<span> gr</span>`;
   keValueEl.innerHTML = `${ke.toFixed(1)}<span> ft-lbs</span>`;
@@ -727,42 +600,15 @@ function calculate(){
     : `⚠ Below recommended minimum for Small Game (need ≥25 ft-lbs)`;
 
   ethicsBody.innerHTML = '';
-  gameThresholds.forEach((g, idx)=>{
+  gameThresholds.forEach(g=>{
     const tr = document.createElement('tr');
     const met = ke >= g.min;
     if(matched && g.name === matched.name) tr.classList.add('active');
     const dotClass = met ? 'met' : 'unmet';
-    tr.innerHTML = `<td><span class="game-class-link" onclick="openModal(${idx})">${g.name}</span></td><td class="examples">${g.examples}</td><td>${g.min} ft-lbs</td><td><div class="status-cell"><span class="status-dot ${dotClass}"></span></div></td>`;
+    tr.innerHTML = `<td>${g.name}</td><td class="examples">${g.examples}</td><td>${g.min} ft-lbs</td><td class="arrow-rec">${g.arrow}</td><td><div class="status-cell"><span class="status-dot ${dotClass}"></span></div></td>`;
     ethicsBody.appendChild(tr);
   });
 }
-
-function openModal(idx){
-  const g = gameThresholds[idx];
-  modalTitle.textContent = g.name;
-  modalExamples.textContent = g.examples;
-  modalMinKE.textContent = `${g.min} ft-lbs`;
-  const met = lastComputedKE >= g.min;
-  modalYourKE.textContent = `${lastComputedKE.toFixed(1)} ft-lbs`;
-  modalYourKE.style.color = met ? '#3fbf5f' : '#e0453a';
-  modalArrowTitle.textContent = g.arrowTitle;
-  modalArrowDesc.textContent = g.arrowDesc;
-  modalOverlay.classList.add('open');
-}
-
-function closeModal(){
-  modalOverlay.classList.remove('open');
-}
-
-function closeModalOnOverlay(event){
-  if(event.target === modalOverlay){
-    closeModal();
-  }
-}
-
-document.addEventListener('keydown', (e)=>{
-  if(e.key === 'Escape') closeModal();
-});
 
 function resetDefaults(){
   drawWeightEl.value = 75;
