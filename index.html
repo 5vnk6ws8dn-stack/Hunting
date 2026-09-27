@@ -1,6 +1,6 @@
 <!--
 Compound Bow Kinetic Energy Calculator
-Version 1.8.0
+Version 1.8.1
 Changelog:
 v1.0.0 - Initial KE/momentum calculator
 v1.1.0 - Component vs total-weight modes; broadhead dropdown
@@ -18,13 +18,16 @@ v1.7.0 - Replaced game-class table with 5-tier structure (Small/Medium/Large/
 v1.8.0 - Added Rage Hypodermic and Rage Trypan T2 mechanical broadheads to
          both broadhead dropdowns; corrected Iron Will 100gr description to
          double bevel with bleeder (150/200gr remain single bevel, no bleeder)
+v1.8.1 - Corrected second mechanical broadhead from "Rage Trypan T2" to the
+         actual product: G5 T2 (2-blade expandable, 100/125gr, 2" cut,
+         all-steel, co-developed with John Dudley/Nock On)
 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Compound Bow Kinetic Energy Calculator v1.8.0</title>
+<title>Compound Bow Kinetic Energy Calculator v1.8.1</title>
 <style>
   :root{--bg:#000;--panel:#151515;--panel2:#1f1f1f;--border:#333;--accent:#3ba55d;--accent2:#4da8ff;--red:#e5484d;--text:#e8e8e8;--muted:#9a9a9a;}
   *{box-sizing:border-box;}
@@ -80,7 +83,7 @@ v1.8.0 - Added Rage Hypodermic and Rage Trypan T2 mechanical broadheads to
 <body>
 <div class="wrap">
   <header>
-    <span class="version-badge">v1.8.0</span>
+    <span class="version-badge">v1.8.1</span>
     <h1>Compound Bow Kinetic Energy Calculator</h1>
     <div class="subtitle">Enter your bow and arrow specs to calculate KE, momentum, and FOC</div>
   </header>
@@ -130,7 +133,7 @@ v1.8.0 - Added Rage Hypodermic and Rage Trypan T2 mechanical broadheads to
             <option value="150">150 gr - Iron Will (single bevel, no bleeder)</option>
             <option value="200">200 gr - Iron Will (single bevel, no bleeder)</option>
             <option value="100">100 gr - Rage Hypodermic (mechanical, 2" cut)</option>
-            <option value="100">100 gr - Rage Trypan T2 (mechanical, 2+" cut)</option>
+            <option value="100">100 gr - G5 T2 (mechanical, 2" cut, all-steel)</option>
             <option value="custom">Custom</option>
           </select>
         </div>
@@ -158,7 +161,7 @@ v1.8.0 - Added Rage Hypodermic and Rage Trypan T2 mechanical broadheads to
             <option value="150">150 gr - Iron Will (single bevel, no bleeder)</option>
             <option value="200">200 gr - Iron Will (single bevel, no bleeder)</option>
             <option value="100">100 gr - Rage Hypodermic (mechanical, 2" cut)</option>
-            <option value="100">100 gr - Rage Trypan T2 (mechanical, 2+" cut)</option>
+            <option value="100">100 gr - G5 T2 (mechanical, 2" cut, all-steel)</option>
             <option value="custom">Custom</option>
           </select>
         </div>
@@ -194,11 +197,11 @@ v1.8.0 - Added Rage Hypodermic and Rage Trypan T2 mechanical broadheads to
 
   <footer>
     Iron Will 100gr is a double-bevel head with a bleeder blade for a wider wound channel; the 150gr and 200gr Iron Will options are single-bevel, no-bleeder heads built for continued rotation through bone and thick hide on heavier game.<br>
-    Rage Hypodermic and Rage Trypan T2 are mechanical (rear-deploying) broadheads with 2"+ cutting diameters - excellent for deer-class game where wound channel size matters most, but generally not recommended for dangerous or heavy-boned game where fixed/single-bevel heads hold up better on bone impact.<br>
+    Rage Hypodermic and G5 T2 are mechanical (rear-deploying) broadheads with 2" cutting diameters - excellent for deer-class game where wound channel size matters most, but generally not recommended for dangerous or heavy-boned game where fixed/single-bevel heads hold up better on bone impact.<br>
     Dangerous Game hunts (Cape Buffalo, Elephant, Hippo, Rhino) in South Africa legally require a minimum 80 lb draw weight and 750-grain arrow at minimum, with many outfitters preferring 100+ ft-lbs and 700-800+ grain arrows - verify current outfitter/PH requirements before booking.<br>
     Nock On arrow recommendations are general guidance by shaft category; confirm exact spine via Nock On's spine chart or a pro shop.<br>
     Green dot = meets minimum KE for that class. Red dot = below minimum KE for that class.<br>
-    Compound Bow Kinetic Energy Calculator - Version 1.8.0
+    Compound Bow Kinetic Energy Calculator - Version 1.8.1
   </footer>
 </div>
 
