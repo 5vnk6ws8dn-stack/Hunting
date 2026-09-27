@@ -1,6 +1,6 @@
 <!--
 Compound Bow Kinetic Energy Calculator
-Version 1.6.0
+Version 1.7.0
 Changelog:
 v1.0.0 - Initial KE/momentum calculator
 v1.1.0 - Component vs total-weight modes; broadhead dropdown
@@ -11,18 +11,22 @@ v1.4.1 - Default shaft weight corrected to 388gr (total arrow 538gr)
 v1.5.0 - Easton 5mm Axis 260 reference note; default speed 289fps
 v1.6.0 - Switched recommendations to Nock On (Axis/FMJ/Sonic KE); broadheads
          reframed as Iron Will Buffalo 100/150/200gr single-bevel heads
+v1.6.1 - Renamed broadhead label from "Iron Will Buffalo" to "Iron Will"
+v1.7.0 - Replaced game-class table with 5-tier structure (Small/Medium/Large/
+         Toughest-Big/Dangerous Game), added Min. Arrow Weight column, added
+         Recommended Arrow Weight to popup
 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Compound Bow Kinetic Energy Calculator v1.6.0</title>
+<title>Compound Bow Kinetic Energy Calculator v1.7.0</title>
 <style>
   :root{--bg:#000;--panel:#151515;--panel2:#1f1f1f;--border:#333;--accent:#3ba55d;--accent2:#4da8ff;--red:#e5484d;--text:#e8e8e8;--muted:#9a9a9a;}
   *{box-sizing:border-box;}
   body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;margin:0;padding:24px;line-height:1.5;}
-  .wrap{max-width:960px;margin:0 auto;}
+  .wrap{max-width:1000px;margin:0 auto;}
   header{text-align:center;margin-bottom:20px;}
   h1{font-size:1.6rem;margin:0 0 6px;}
   .version-badge{display:inline-block;background:var(--accent);color:#fff;font-size:.75rem;font-weight:600;padding:2px 10px;border-radius:12px;margin-bottom:10px;}
@@ -47,7 +51,7 @@ v1.6.0 - Switched recommendations to Nock On (Axis/FMJ/Sonic KE); broadheads
   .foc-bar-wrap{margin-top:10px;}
   .foc-bar-bg{background:#0d0d0d;border-radius:6px;height:10px;overflow:hidden;border:1px solid var(--border);}
   .foc-bar-fill{background:var(--accent);height:100%;}
-  table{width:100%;border-collapse:collapse;font-size:.85rem;min-width:640px;}
+  table{width:100%;border-collapse:collapse;font-size:.85rem;min-width:760px;}
   thead th{text-align:left;color:var(--muted);font-weight:600;padding:8px 6px;border-bottom:1px solid var(--border);}
   tbody td{padding:9px 6px;border-bottom:1px solid var(--border);}
   tbody tr{cursor:pointer;transition:background .15s;}
@@ -73,7 +77,7 @@ v1.6.0 - Switched recommendations to Nock On (Axis/FMJ/Sonic KE); broadheads
 <body>
 <div class="wrap">
   <header>
-    <span class="version-badge">v1.6.0</span>
+    <span class="version-badge">v1.7.0</span>
     <h1>Compound Bow Kinetic Energy Calculator</h1>
     <div class="subtitle">Enter your bow and arrow specs to calculate KE, momentum, and FOC</div>
   </header>
@@ -117,11 +121,11 @@ v1.6.0 - Switched recommendations to Nock On (Axis/FMJ/Sonic KE); broadheads
           <input type="number" id="hardwareWeight" value="50" min="0" max="150">
         </div>
         <div class="field">
-          <label for="broadheadSelectComp">Broadhead - Iron Will Buffalo (grains)</label>
+          <label for="broadheadSelectComp">Broadhead - Iron Will (grains)</label>
           <select id="broadheadSelectComp">
-            <option value="100">100 gr - Iron Will Buffalo (single bevel, no bleeder)</option>
-            <option value="150">150 gr - Iron Will Buffalo (single bevel, no bleeder)</option>
-            <option value="200">200 gr - Iron Will Buffalo (single bevel, no bleeder)</option>
+            <option value="100">100 gr - Iron Will (single bevel, no bleeder)</option>
+            <option value="150">150 gr - Iron Will (single bevel, no bleeder)</option>
+            <option value="200">200 gr - Iron Will (single bevel, no bleeder)</option>
             <option value="custom">Custom</option>
           </select>
         </div>
@@ -143,11 +147,11 @@ v1.6.0 - Switched recommendations to Nock On (Axis/FMJ/Sonic KE); broadheads
           <input type="number" id="totalWeight" value="538" min="200" max="1200">
         </div>
         <div class="field">
-          <label for="broadheadSelectTotal">Broadhead - Iron Will Buffalo (grains)</label>
+          <label for="broadheadSelectTotal">Broadhead - Iron Will (grains)</label>
           <select id="broadheadSelectTotal">
-            <option value="100">100 gr - Iron Will Buffalo (single bevel, no bleeder)</option>
-            <option value="150">150 gr - Iron Will Buffalo (single bevel, no bleeder)</option>
-            <option value="200">200 gr - Iron Will Buffalo (single bevel, no bleeder)</option>
+            <option value="100">100 gr - Iron Will (single bevel, no bleeder)</option>
+            <option value="150">150 gr - Iron Will (single bevel, no bleeder)</option>
+            <option value="200">200 gr - Iron Will (single bevel, no bleeder)</option>
             <option value="custom">Custom</option>
           </select>
         </div>
@@ -174,19 +178,19 @@ v1.6.0 - Switched recommendations to Nock On (Axis/FMJ/Sonic KE); broadheads
     <h2>Game Class Suitability</h2>
     <div class="table-scroll">
       <table>
-        <thead><tr><th>Game Class</th><th>Examples</th><th>Min. KE</th><th>Recommended Nock On Arrow</th><th>Status</th></tr></thead>
+        <thead><tr><th>Game Category</th><th>Representative Species</th><th>Recommended Arrow KE</th><th>Min. Arrow Weight</th><th>Status</th></tr></thead>
         <tbody id="gameTableBody"></tbody>
       </table>
     </div>
-    <div class="table-hint">Click any row to see the recommended arrow build and status detail in a popup.</div>
+    <div class="table-hint">Click any row to see the recommended arrow build, arrow weight, and status detail in a popup.</div>
   </div>
 
   <footer>
-    Iron Will Buffalo broadheads (100 / 150 / 200 gr) are single-bevel, no-bleeder, cut-on-contact heads built to keep rotating through bone and thick hide for maximum penetration on dangerous and heavy-boned game.<br>
-    Cape Buffalo hunts in South Africa legally require a minimum 80 lb draw weight, 750-grain arrow, and two-blade cut-on-contact broadhead - verify current outfitter/PH requirements before booking a dangerous-game hunt.<br>
+    Iron Will broadheads (100 / 150 / 200 gr) are single-bevel, no-bleeder, cut-on-contact heads built to keep rotating through bone and thick hide for maximum penetration on dangerous and heavy-boned game.<br>
+    Dangerous Game hunts (Cape Buffalo, Elephant, Hippo, Rhino) in South Africa legally require a minimum 80 lb draw weight and 750-grain arrow at minimum, with many outfitters preferring 100+ ft-lbs and 700-800+ grain arrows - verify current outfitter/PH requirements before booking.<br>
     Nock On arrow recommendations are general guidance by shaft category; confirm exact spine via Nock On's spine chart or a pro shop.<br>
     Green dot = meets minimum KE for that class. Red dot = below minimum KE for that class.<br>
-    Compound Bow Kinetic Energy Calculator - Version 1.6.0
+    Compound Bow Kinetic Energy Calculator - Version 1.7.0
   </footer>
 </div>
 
@@ -194,8 +198,9 @@ v1.6.0 - Switched recommendations to Nock On (Axis/FMJ/Sonic KE); broadheads
   <div class="modal-box">
     <button class="modal-close" id="modalClose">&times;</button>
     <h3 id="modalTitle"></h3>
-    <div class="modal-row"><span class="lbl">Examples:</span> <span id="modalExamples"></span></div>
-    <div class="modal-row"><span class="lbl">Minimum KE Required:</span> <span id="modalMinKE"></span> ft-lbs</div>
+    <div class="modal-row"><span class="lbl">Representative Species:</span> <span id="modalExamples"></span></div>
+    <div class="modal-row"><span class="lbl">Recommended Arrow KE:</span> <span id="modalKERange"></span></div>
+    <div class="modal-row"><span class="lbl">Minimum Arrow Weight:</span> <span id="modalArrowWeight"></span></div>
     <div class="modal-row"><span class="lbl">Your Current KE:</span> <span id="modalCurrentKE"></span></div>
     <div class="modal-row"><span class="lbl">Recommended Nock On Arrow:</span><br><span id="modalArrow"></span></div>
     <div class="modal-row" id="modalNote" style="color:var(--muted);font-size:.82rem;"></div>
@@ -204,13 +209,11 @@ v1.6.0 - Switched recommendations to Nock On (Axis/FMJ/Sonic KE); broadheads
 
 <script>
 const gameClasses = [
-  {name:"Small Game",examples:"Bushbuck, Duiker, Klipspringer",min:25,arrow:"Nock On AXIS 400/340 - lighter spine, efficient for small, thin-skinned game.",note:"Lighter shaft keeps speed high without over-building for small animals."},
-  {name:"Medium Game",examples:"Whitetail, Mule Deer, Pronghorn Antelope, Bighorn Sheep, Impala, Warthog",min:40,arrow:"Nock On AXIS 300 - balanced weight and spine for deer-class game.",note:"Pronghorn and Bighorn Sheep are thin-skinned and deer-sized despite rugged reputations."},
-  {name:"Large Game",examples:"Elk, Black Bear, Wild Boar, Nyala",min:50,arrow:"Nock On FMJ 300 - metal-jacketed shaft adds mass and durability for tougher, heavier animals.",note:"Elk typically falls in the 42-65 ft-lb range depending on setup."},
-  {name:"Plains Game",examples:"Kudu, Zebra, Eland, Gemsbok, Wildebeest",min:65,arrow:"Nock On FMJ 260 - stiffer spine and higher GPI for large, tough-hided plains antelope.",note:"Large-bodied plains antelope require deeper penetration than typical deer-class game."},
-  {name:"Sable / Roan",examples:"Sable Antelope, Roan Antelope",min:65,arrow:"Nock On FMJ 260 - same heavy-for-spine build recommended for large plains game.",note:"Sable and Roan are notably tough, muscular antelope; extra margin beyond legal minimum recommended."},
-  {name:"Moose / Brown Bear / Grizzly",examples:"Moose, Brown Bear, Grizzly",min:65,arrow:"Nock On SONIC KE 250 - kinetic-energy-focused shaft built for heavy, deep-bodied game.",note:"Heavy bone structure and thick muscle mass call for high FOC and strong broadhead penetration."},
-  {name:"Cape Buffalo",examples:"Cape Buffalo, Giraffe (SA)",min:80,arrow:"Nock On FMJ 250 (heavy-build, 750+ gr total) - maximum mass and stiffness for dangerous game.",note:"SA law requires min. 80 lb draw, 750 gr arrow, two-blade cut-on-contact head - Iron Will Buffalo 200gr is a proven field choice."}
+  {name:"Small Game",examples:"Rabbits, Squirrels, Game Birds",keLabel:"< 25 ft-lbs",min:25,weightLabel:"300 grains",arrow:"Nock On AXIS 400/340 - lighter spine, efficient for small, thin-skinned game.",note:"Lighter shaft keeps speed high without over-building for small game."},
+  {name:"Medium Game",examples:"Whitetail Deer, Pronghorn, Antelope, Sheep",keLabel:"25 - 41 ft-lbs",min:25,weightLabel:"350 - 400 grains",arrow:"Nock On AXIS 300 - balanced weight and spine for deer-class game.",note:"Covers thin-skinned, deer-sized game including pronghorn and mountain sheep."},
+  {name:"Large Game",examples:"Elk, Black Bear, Wild Boar, Caribou",keLabel:"42 - 65 ft-lbs",min:42,weightLabel:"400 - 500 grains",arrow:"Nock On FMJ 300 - metal-jacketed shaft adds mass and durability for tougher, heavier animals.",note:"Elk, boar, and bear require more penetration than deer-class game."},
+  {name:"Toughest / Big Game",examples:"Moose, Grizzly Bear, African Plains Game (Kudu)",keLabel:"65 - 80 ft-lbs",min:65,weightLabel:"500 - 600 grains",arrow:"Nock On SONIC KE 250 - kinetic-energy-focused shaft built for heavy, deep-bodied game.",note:"Heavy bone structure and thick muscle mass call for high FOC and strong broadhead penetration."},
+  {name:"Dangerous Game",examples:"Cape Buffalo, Elephant, Hippo, Rhino",keLabel:"80+ ft-lbs (100+ preferred)",min:80,weightLabel:"700 - 800+ grains",arrow:"Nock On FMJ 250 (heavy-build, 750+ gr total) - maximum mass and stiffness for dangerous game.",note:"Legal minimums require 80 lb draw and 750 gr arrow; many outfitters prefer 100+ ft-lbs and 700-800+ gr for a true margin of safety."}
 ];
 
 function $(id){ return document.getElementById(id); }
@@ -264,10 +267,10 @@ function calculate(){
   $("resMomentum").textContent = momentum.toFixed(3) + " slug-ft/s";
   $("resFOC").textContent = focPct.toFixed(1) + "%";
   $("focBarFill").style.width = Math.max(Math.min(focPct * 3, 100), 0) + "%";
-  renderTable(ke);
+  renderTable(ke, totalWeight);
   return ke;
 }
-function renderTable(ke){
+function renderTable(ke, totalWeight){
   const body = $("gameTableBody");
   body.innerHTML = "";
   gameClasses.forEach((g, idx) => {
@@ -277,22 +280,23 @@ function renderTable(ke){
     tr.innerHTML = `
       <td><span class="game-class-link">${g.name}</span></td>
       <td>${g.examples}</td>
-      <td>${g.min} ft-lbs</td>
-      <td>${g.arrow}</td>
+      <td>${g.keLabel}</td>
+      <td>${g.weightLabel}</td>
       <td><span class="dot ${meets ? 'green' : 'red'}"></span></td>
     `;
-    tr.addEventListener("click", () => openModal(idx, ke));
+    tr.addEventListener("click", () => openModal(idx, ke, totalWeight));
     body.appendChild(tr);
   });
 }
-function openModal(idx, ke){
+function openModal(idx, ke, totalWeight){
   const g = gameClasses[idx];
   const meets = ke >= g.min;
   $("modalTitle").textContent = g.name;
   $("modalExamples").textContent = g.examples;
-  $("modalMinKE").textContent = g.min;
+  $("modalKERange").textContent = g.keLabel;
+  $("modalArrowWeight").textContent = g.weightLabel;
   const curEl = $("modalCurrentKE");
-  curEl.textContent = ke.toFixed(1) + " ft-lbs";
+  curEl.textContent = ke.toFixed(1) + " ft-lbs (arrow: " + totalWeight.toFixed(1) + " gr)";
   curEl.className = "modal-ke " + (meets ? "green" : "red");
   $("modalArrow").textContent = g.arrow;
   $("modalNote").textContent = g.note;
