@@ -1,6 +1,6 @@
 <!--
 Compound Bow Kinetic Energy Calculator
-Version 1.7.0
+Version 1.8.0
 Changelog:
 v1.0.0 - Initial KE/momentum calculator
 v1.1.0 - Component vs total-weight modes; broadhead dropdown
@@ -15,13 +15,16 @@ v1.6.1 - Renamed broadhead label from "Iron Will Buffalo" to "Iron Will"
 v1.7.0 - Replaced game-class table with 5-tier structure (Small/Medium/Large/
          Toughest-Big/Dangerous Game), added Min. Arrow Weight column, added
          Recommended Arrow Weight to popup
+v1.8.0 - Added Rage Hypodermic and Rage Trypan T2 mechanical broadheads to
+         both broadhead dropdowns; corrected Iron Will 100gr description to
+         double bevel with bleeder (150/200gr remain single bevel, no bleeder)
 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Compound Bow Kinetic Energy Calculator v1.7.0</title>
+<title>Compound Bow Kinetic Energy Calculator v1.8.0</title>
 <style>
   :root{--bg:#000;--panel:#151515;--panel2:#1f1f1f;--border:#333;--accent:#3ba55d;--accent2:#4da8ff;--red:#e5484d;--text:#e8e8e8;--muted:#9a9a9a;}
   *{box-sizing:border-box;}
@@ -77,7 +80,7 @@ v1.7.0 - Replaced game-class table with 5-tier structure (Small/Medium/Large/
 <body>
 <div class="wrap">
   <header>
-    <span class="version-badge">v1.7.0</span>
+    <span class="version-badge">v1.8.0</span>
     <h1>Compound Bow Kinetic Energy Calculator</h1>
     <div class="subtitle">Enter your bow and arrow specs to calculate KE, momentum, and FOC</div>
   </header>
@@ -121,11 +124,13 @@ v1.7.0 - Replaced game-class table with 5-tier structure (Small/Medium/Large/
           <input type="number" id="hardwareWeight" value="50" min="0" max="150">
         </div>
         <div class="field">
-          <label for="broadheadSelectComp">Broadhead - Iron Will (grains)</label>
+          <label for="broadheadSelectComp">Broadhead</label>
           <select id="broadheadSelectComp">
-            <option value="100">100 gr - Iron Will (single bevel, no bleeder)</option>
+            <option value="100">100 gr - Iron Will (double bevel, with bleeder)</option>
             <option value="150">150 gr - Iron Will (single bevel, no bleeder)</option>
             <option value="200">200 gr - Iron Will (single bevel, no bleeder)</option>
+            <option value="100">100 gr - Rage Hypodermic (mechanical, 2" cut)</option>
+            <option value="100">100 gr - Rage Trypan T2 (mechanical, 2+" cut)</option>
             <option value="custom">Custom</option>
           </select>
         </div>
@@ -147,11 +152,13 @@ v1.7.0 - Replaced game-class table with 5-tier structure (Small/Medium/Large/
           <input type="number" id="totalWeight" value="538" min="200" max="1200">
         </div>
         <div class="field">
-          <label for="broadheadSelectTotal">Broadhead - Iron Will (grains)</label>
+          <label for="broadheadSelectTotal">Broadhead</label>
           <select id="broadheadSelectTotal">
-            <option value="100">100 gr - Iron Will (single bevel, no bleeder)</option>
+            <option value="100">100 gr - Iron Will (double bevel, with bleeder)</option>
             <option value="150">150 gr - Iron Will (single bevel, no bleeder)</option>
             <option value="200">200 gr - Iron Will (single bevel, no bleeder)</option>
+            <option value="100">100 gr - Rage Hypodermic (mechanical, 2" cut)</option>
+            <option value="100">100 gr - Rage Trypan T2 (mechanical, 2+" cut)</option>
             <option value="custom">Custom</option>
           </select>
         </div>
@@ -186,11 +193,12 @@ v1.7.0 - Replaced game-class table with 5-tier structure (Small/Medium/Large/
   </div>
 
   <footer>
-    Iron Will broadheads (100 / 150 / 200 gr) are single-bevel, no-bleeder, cut-on-contact heads built to keep rotating through bone and thick hide for maximum penetration on dangerous and heavy-boned game.<br>
+    Iron Will 100gr is a double-bevel head with a bleeder blade for a wider wound channel; the 150gr and 200gr Iron Will options are single-bevel, no-bleeder heads built for continued rotation through bone and thick hide on heavier game.<br>
+    Rage Hypodermic and Rage Trypan T2 are mechanical (rear-deploying) broadheads with 2"+ cutting diameters - excellent for deer-class game where wound channel size matters most, but generally not recommended for dangerous or heavy-boned game where fixed/single-bevel heads hold up better on bone impact.<br>
     Dangerous Game hunts (Cape Buffalo, Elephant, Hippo, Rhino) in South Africa legally require a minimum 80 lb draw weight and 750-grain arrow at minimum, with many outfitters preferring 100+ ft-lbs and 700-800+ grain arrows - verify current outfitter/PH requirements before booking.<br>
     Nock On arrow recommendations are general guidance by shaft category; confirm exact spine via Nock On's spine chart or a pro shop.<br>
     Green dot = meets minimum KE for that class. Red dot = below minimum KE for that class.<br>
-    Compound Bow Kinetic Energy Calculator - Version 1.7.0
+    Compound Bow Kinetic Energy Calculator - Version 1.8.0
   </footer>
 </div>
 
@@ -213,7 +221,7 @@ const gameClasses = [
   {name:"Medium Game",examples:"Whitetail Deer, Pronghorn, Antelope, Sheep",keLabel:"25 - 41 ft-lbs",min:25,weightLabel:"350 - 400 grains",arrow:"Nock On AXIS 300 - balanced weight and spine for deer-class game.",note:"Covers thin-skinned, deer-sized game including pronghorn and mountain sheep."},
   {name:"Large Game",examples:"Elk, Black Bear, Wild Boar, Caribou",keLabel:"42 - 65 ft-lbs",min:42,weightLabel:"400 - 500 grains",arrow:"Nock On FMJ 300 - metal-jacketed shaft adds mass and durability for tougher, heavier animals.",note:"Elk, boar, and bear require more penetration than deer-class game."},
   {name:"Toughest / Big Game",examples:"Moose, Grizzly Bear, African Plains Game (Kudu)",keLabel:"65 - 80 ft-lbs",min:65,weightLabel:"500 - 600 grains",arrow:"Nock On SONIC KE 250 - kinetic-energy-focused shaft built for heavy, deep-bodied game.",note:"Heavy bone structure and thick muscle mass call for high FOC and strong broadhead penetration."},
-  {name:"Dangerous Game",examples:"Cape Buffalo, Elephant, Hippo, Rhino",keLabel:"80+ ft-lbs (100+ preferred)",min:80,weightLabel:"700 - 800+ grains",arrow:"Nock On FMJ 250 (heavy-build, 750+ gr total) - maximum mass and stiffness for dangerous game.",note:"Legal minimums require 80 lb draw and 750 gr arrow; many outfitters prefer 100+ ft-lbs and 700-800+ gr for a true margin of safety."}
+  {name:"Dangerous Game",examples:"Cape Buffalo, Elephant, Hippo, Rhino",keLabel:"80+ ft-lbs (100+ preferred)",min:80,weightLabel:"700 - 800+ grains",arrow:"Nock On FMJ 250 (heavy-build, 750+ gr total) - maximum mass and stiffness for dangerous game.",note:"Legal minimums require 80 lb draw and 750 gr arrow; many outfitters prefer 100+ ft-lbs and 700-800+ gr for a true margin of safety. Use fixed/single-bevel heads (e.g. Iron Will 200gr) rather than mechanicals for this category."}
 ];
 
 function $(id){ return document.getElementById(id); }
