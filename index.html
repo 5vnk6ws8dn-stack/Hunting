@@ -1,332 +1,360 @@
-<!--
-Compound Bow Kinetic Energy Calculator
-Version 1.8.1
-Changelog:
-v1.0.0 - Initial KE/momentum calculator
-v1.1.0 - Component vs total-weight modes; broadhead dropdown
-v1.2.0 - Renamed Moose category to Large Game (incl. Cape Buffalo)
-v1.3.0 - Expanded ethics table; added Recommended Arrow column; version tracking
-v1.4.0 - New defaults (75#,285fps,29.5in,433/50/100gr); clickable rows + popup
-v1.4.1 - Default shaft weight corrected to 388gr (total arrow 538gr)
-v1.5.0 - Easton 5mm Axis 260 reference note; default speed 289fps
-v1.6.0 - Switched recommendations to Nock On (Axis/FMJ/Sonic KE); broadheads
-         reframed as Iron Will Buffalo 100/150/200gr single-bevel heads
-v1.6.1 - Renamed broadhead label from "Iron Will Buffalo" to "Iron Will"
-v1.7.0 - Replaced game-class table with 5-tier structure (Small/Medium/Large/
-         Toughest-Big/Dangerous Game), added Min. Arrow Weight column, added
-         Recommended Arrow Weight to popup
-v1.8.0 - Added Rage Hypodermic and Rage Trypan T2 mechanical broadheads to
-         both broadhead dropdowns; corrected Iron Will 100gr description to
-         double bevel with bleeder (150/200gr remain single bevel, no bleeder)
-v1.8.1 - Corrected second mechanical broadhead from "Rage Trypan T2" to the
-         actual product: G5 T2 (2-blade expandable, 100/125gr, 2" cut,
-         all-steel, co-developed with John Dudley/Nock On)
--->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Compound Bow Kinetic Energy Calculator v1.8.1</title>
-<style>
-  :root{--bg:#000;--panel:#151515;--panel2:#1f1f1f;--border:#333;--accent:#3ba55d;--accent2:#4da8ff;--red:#e5484d;--text:#e8e8e8;--muted:#9a9a9a;}
-  *{box-sizing:border-box;}
-  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;margin:0;padding:24px;line-height:1.5;}
-  .wrap{max-width:1000px;margin:0 auto;}
-  header{text-align:center;margin-bottom:20px;}
-  h1{font-size:1.6rem;margin:0 0 6px;}
-  .version-badge{display:inline-block;background:var(--accent);color:#fff;font-size:.75rem;font-weight:600;padding:2px 10px;border-radius:12px;margin-bottom:10px;}
-  .subtitle{color:var(--muted);font-size:.9rem;}
-  .panel{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-bottom:18px;}
-  .panel h2{font-size:1.1rem;margin-top:0;margin-bottom:4px;}
-  .ref-note{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:.82rem;color:var(--muted);margin-bottom:14px;}
-  .mode-toggle{display:flex;gap:8px;margin-bottom:14px;}
-  .mode-toggle button{flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--panel2);color:var(--text);cursor:pointer;font-size:.85rem;}
-  .mode-toggle button.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600;}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-  @media (max-width:640px){.grid{grid-template-columns:1fr;}}
-  label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:4px;}
-  input[type=number], select{width:100%;padding:8px 10px;border-radius:6px;border:1px solid var(--border);background:#0d0d0d;color:var(--text);font-size:.95rem;}
-  .field{margin-bottom:12px;}
-  .hidden{display:none;}
-  .results{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:6px;}
-  @media (max-width:640px){.results{grid-template-columns:1fr;}}
-  .stat{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;}
-  .stat .label{font-size:.78rem;color:var(--muted);}
-  .stat .value{font-size:1.4rem;font-weight:700;color:var(--accent2);}
-  .foc-bar-wrap{margin-top:10px;}
-  .foc-bar-bg{background:#0d0d0d;border-radius:6px;height:10px;overflow:hidden;border:1px solid var(--border);}
-  .foc-bar-fill{background:var(--accent);height:100%;}
-  table{width:100%;border-collapse:collapse;font-size:.85rem;min-width:760px;}
-  thead th{text-align:left;color:var(--muted);font-weight:600;padding:8px 6px;border-bottom:1px solid var(--border);}
-  tbody td{padding:9px 6px;border-bottom:1px solid var(--border);}
-  tbody tr{cursor:pointer;transition:background .15s;}
-  tbody tr:hover{background:var(--panel2);}
-  .game-class-link{color:var(--accent2);text-decoration:underline;font-weight:600;}
-  .dot{display:inline-block;width:12px;height:12px;border-radius:50%;}
-  .dot.green{background:var(--accent);box-shadow:0 0 6px var(--accent);}
-  .dot.red{background:var(--red);box-shadow:0 0 6px var(--red);}
-  .table-hint{font-size:.78rem;color:var(--muted);margin-top:6px;}
-  .table-scroll{overflow-x:auto;}
-  footer{font-size:.75rem;color:var(--muted);text-align:center;margin-top:26px;line-height:1.6;}
-  .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);align-items:center;justify-content:center;z-index:999;}
-  .modal-overlay.open{display:flex;}
-  .modal-box{background:var(--panel);border:1px solid var(--border);border-radius:10px;max-width:440px;width:90%;padding:22px;position:relative;}
-  .modal-box h3{margin-top:0;color:var(--accent2);}
-  .modal-close{position:absolute;top:10px;right:14px;background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;}
-  .modal-row{margin-bottom:8px;font-size:.9rem;}
-  .modal-row .lbl{color:var(--muted);font-size:.78rem;}
-  .modal-ke.green{color:var(--accent);font-weight:700;}
-  .modal-ke.red{color:var(--red);font-weight:700;}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Archery KE Calculator</title>
+  <style>
+    :root,
+    [data-theme="light"] {
+      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+      --color-bg: #0b0b0b;
+      --color-surface: #141414;
+      --color-surface-2: #1d1d1d;
+      --color-border: #2b2b2b;
+      --color-text: #ece4d8;
+      --color-text-muted: #b4aa9b;
+      --color-text-faint: #887d6e;
+      --color-primary: #c98a3f;
+      --color-primary-strong: #e1a45d;
+      --color-primary-soft: rgba(201, 138, 63, 0.12);
+      --color-green: #63c174;
+      --shadow: 0 12px 30px rgba(0,0,0,0.35);
+      --radius-lg: 1rem;
+      --font-body: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font-body);
+      background: radial-gradient(circle at top right, rgba(201,138,63,0.08), transparent 22%), var(--color-bg);
+      color: var(--color-text);
+      min-height: 100vh;
+      padding: 24px 16px 56px;
+    }
+    .wrap { max-width: 1120px; margin: 0 auto; }
+    header { text-align: center; margin-bottom: 28px; }
+    h1 { margin: 0 0 10px; font-size: var(--text-xl); line-height: 1.1; }
+    .subhead { margin: 0 auto; max-width: 70ch; color: var(--color-text-muted); font-size: var(--text-sm); }
+    .version-tag { display: inline-block; margin-top: 12px; padding: 5px 12px; border: 1px solid var(--color-border); border-radius: 999px; background: var(--color-surface); color: var(--color-text-faint); font-size: 0.78rem; letter-spacing: 0.04em; }
+    .grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 20px; }
+    .card, .results, .table-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 22px 24px; }
+    .card h2, .results h2, .table-card h2 { margin: 0 0 6px; font-size: 1.08rem; color: var(--color-primary); }
+    .section-copy { color: var(--color-text-muted); font-size: 0.88rem; line-height: 1.5; margin-bottom: 18px; }
+    .field { margin-bottom: 16px; }
+    .field:last-child { margin-bottom: 0; }
+    label { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 6px; color: var(--color-text-muted); font-size: 0.88rem; }
+    .unit { color: var(--color-text-faint); font-size: 0.8rem; }
+    input, select { width: 100%; min-height: 46px; padding: 11px 12px; background: var(--color-surface-2); border: 1px solid var(--color-border); border-radius: 10px; color: var(--color-text); font-size: 1rem; outline: none; transition: border-color .15s ease, box-shadow .15s ease; }
+    input:focus, select:focus { border-color: var(--color-primary); box-shadow: 0 0 0 4px rgba(201,138,63,0.14); }
+    .hint { margin-top: 6px; color: var(--color-text-faint); font-size: 0.76rem; line-height: 1.4; }
+    .broadhead-card { display: block; margin-top: 14px; background: var(--color-surface-2); border: 1px solid var(--color-border); border-radius: 12px; padding: 14px; }
+    .broadhead-meta h3 { margin: 0 0 8px; font-size: 1rem; color: var(--color-primary-strong); }
+    .broadhead-meta p { margin: 0 0 8px; color: var(--color-text-muted); font-size: 0.84rem; line-height: 1.45; }
+    .mini-specs { display: flex; flex-wrap: wrap; gap: 8px; }
+    .mini-specs span { display: inline-flex; align-items: center; padding: 6px 10px; border-radius: 999px; font-size: 0.75rem; border: 1px solid rgba(201,138,63,0.28); background: var(--color-primary-soft); color: var(--color-primary-strong); }
+    .results { margin-top: 20px; }
+    .result-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 18px; }
+    .stat { background: var(--color-surface-2); border: 1px solid var(--color-border); border-radius: 12px; padding: 16px; text-align: center; }
+    .stat .label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-faint); margin-bottom: 8px; }
+    .stat .value { font-size: 1.5rem; font-weight: 700; line-height: 1.15; }
+    .stat .value span { font-size: 0.95rem; color: var(--color-text-muted); font-weight: 400; }
+    .summary-note { margin-top: 18px; color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.55; }
+    .table-card { margin-top: 20px; }
+    .table-wrap, .game-table-wrap { overflow-x: auto; margin-top: 16px; border: 1px solid var(--color-border); border-radius: 12px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    thead { background: rgba(201,138,63,0.1); }
+    th, td { padding: 11px 12px; border-bottom: 1px solid var(--color-border); text-align: left; white-space: nowrap; font-variant-numeric: tabular-nums; vertical-align: top; }
+    tbody tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+    tbody tr:last-child td { border-bottom: none; }
+    .footer-note { margin-top: 14px; color: var(--color-text-faint); font-size: 0.76rem; line-height: 1.5; }
+    .game-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 18px; }
+    .game-card { background: var(--color-surface-2); border: 1px solid var(--color-border); border-radius: 12px; padding: 16px; }
+    .game-card h3 { margin: 0 0 10px; color: var(--color-primary-strong); font-size: 0.98rem; }
+    .game-card p { margin: 0 0 10px; color: var(--color-text-muted); font-size: 0.82rem; line-height: 1.45; }
+    .game-card ul { margin: 0; padding-left: 18px; color: var(--color-text); font-size: 0.85rem; line-height: 1.55; }
+    .game-card li + li { margin-top: 6px; }
+    .game-category { font-weight: 600; color: var(--color-primary-strong); }
+    .pill { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px; background: var(--color-primary-soft); color: var(--color-primary-strong); border: 1px solid rgba(201,138,63,0.28); font-size: 0.82rem; margin-top: 14px; }
+    .pill::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--color-green); box-shadow: 0 0 10px rgba(99,193,116,0.4); }
+    @media (max-width: 900px) { .grid, .result-grid, .game-grid { grid-template-columns: 1fr 1fr; } .broadhead-card { grid-template-columns: 1fr; } .broadhead-card img { width: 100%; height: 220px; } }
+    @media (max-width: 700px) { .grid, .result-grid, .game-grid { grid-template-columns: 1fr; } body { padding-left: 12px; padding-right: 12px; } .card, .results, .table-card { padding: 18px; } }
+  </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <span class="version-badge">v1.8.1</span>
-    <h1>Compound Bow Kinetic Energy Calculator</h1>
-    <div class="subtitle">Enter your bow and arrow specs to calculate KE, momentum, and FOC</div>
-  </header>
+  <div class="wrap">
+    <header>
+      <h1>🏹 Archery KE Calculator</h1>
+      <p class="subhead">Calculate total arrow weight, kinetic energy, momentum, and estimated downrange energy retention using your finished hunting arrow, selected broadhead, and measured FPS.</p>
+      <span class="version-tag">Version 1.0.2</span>
+    </header>
 
-  <div class="panel">
-    <h2>Bow Setup</h2>
     <div class="grid">
-      <div class="field">
-        <label for="drawWeight">Draw Weight (lbs)</label>
-        <input type="number" id="drawWeight" value="75" min="10" max="120">
-      </div>
-      <div class="field">
-        <label for="arrowSpeed">Arrow Speed - chronographed (fps)</label>
-        <input type="number" id="arrowSpeed" value="289" min="100" max="450">
-      </div>
+      <section class="card">
+        <h2>Bow setup</h2>
+        <p class="section-copy">Use your measured setup values. Arrow weight should include shaft components and inserts, then the selected broadhead is added automatically.</p>
+
+        <div class="field">
+          <label for="drawWeight">Draw weight <span class="unit">lbs</span></label>
+          <input type="number" id="drawWeight" value="75" min="1" step="0.5" />
+          <div class="hint">Reference value for grains-per-pound and setup context.</div>
+        </div>
+
+        <div class="field">
+          <label for="arrowLength">Arrow length <span class="unit">inches</span></label>
+          <input type="number" id="arrowLength" value="29.5" min="1" step="0.25" />
+          <div class="hint">Throat of nock to end of shaft.</div>
+        </div>
+
+        <div class="field">
+          <label for="arrowWeight">Arrow weight excluding broadhead <span class="unit">grains</span></label>
+          <input type="number" id="arrowWeight" value="438" min="1" step="1" />
+          <div class="hint">Include shaft, insert, collar, nock, vanes, and wrap if used.</div>
+        </div>
+
+        <div class="field">
+          <label for="broadheadSelect">Broadhead selection</label>
+          <select id="broadheadSelect"></select>
+          <div class="hint">Selecting a broadhead updates weight, image, and setup guidance.</div>
+        </div>
+
+        <div class="field">
+          <label for="broadheadWeight">Broadhead weight <span class="unit">grains</span></label>
+          <input type="number" id="broadheadWeight" value="100" min="0" step="1" readonly />
+          <div class="hint">Weight now follows the selected broadhead automatically.</div>
+        </div>
+
+        <div class="field">
+          <label for="speed">Arrow speed with selected broadhead <span class="unit">fps</span></label>
+          <input type="number" id="speed" value="289" min="1" step="1" />
+          <div class="hint">Use chronographed FPS for the exact finished hunting arrow and broadhead.</div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Broadhead profile</h2>
+        <p class="section-copy">This panel ties the chosen head to its blade style, weight, and intended use so the calculator stays connected to your hunting setup.</p>
+        <div class="broadhead-card">
+          <div class="broadhead-meta">
+            <h3 id="broadheadName">G5 T2</h3>
+            <p id="broadheadDescription">John Dudley collaboration 2-blade expandable built for a compact 100-grain mechanical option.</p>
+            <div class="mini-specs">
+              <span id="broadheadType">Mechanical</span>
+              <span id="broadheadMass">100 gr</span>
+              <span id="broadheadUse">Deer to elk</span>
+            </div>
+          </div>
+        </div>
+        <div class="field" style="margin-top:16px;">
+          <label>Total arrow weight formula</label>
+          <input type="text" value="Arrow weight excluding broadhead + selected broadhead weight" readonly />
+        </div>
+        <div class="field">
+          <label>Kinetic energy formula</label>
+          <input type="text" value="KE = grains × FPS² ÷ 450240" readonly />
+        </div>
+        <div class="field">
+          <label>Momentum formula</label>
+          <input type="text" value="Momentum = grains × FPS ÷ 225218" readonly />
+        </div>
+        <div class="pill">Drop-off table and game setup guidance update automatically.</div>
+      </section>
     </div>
-    <div class="ref-note">Note: Kinetic energy depends on your actual chronographed arrow speed, not the bow's rated IBO speed.</div>
+
+    <section class="results">
+      <h2>Results</h2>
+      <div class="result-grid">
+        <article class="stat"><div class="label">Total arrow weight</div><div class="value" id="totalWeight">0<span> gr</span></div></article>
+        <article class="stat"><div class="label">Kinetic energy</div><div class="value" id="keValue">0<span> ft-lbs</span></div></article>
+        <article class="stat"><div class="label">Momentum</div><div class="value" id="momentumValue">0<span> slug-ft/s</span></div></article>
+        <article class="stat"><div class="label">Grains per pound</div><div class="value" id="gppValue">0<span> gpp</span></div></article>
+      </div>
+      <p class="summary-note" id="summaryNote"></p>
+    </section>
+
+    <section class="table-card">
+      <h2>Distance and energy drop-off</h2>
+      <p class="section-copy">Estimated values at 30-yard increments through 120 yards. These are modeled projections for comparison, not substitutes for chronograph testing at distance.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Distance</th><th>Estimated FPS</th><th>KE</th><th>Momentum</th><th>Energy drop</th><th>KE retained</th></tr></thead>
+          <tbody id="dropoffBody"></tbody>
+        </table>
+      </div>
+      <p class="footer-note">The distance table uses a simple drag estimate so you can compare setups consistently. Real-world loss depends on shaft diameter, vane drag, broadhead profile, altitude, and weather.</p>
+    </section>
+
+    <section class="table-card">
+      <h2>Nock On game group setups</h2>
+      <p class="section-copy">These recommendations organize game categories around Nock On style priorities: accuracy first, compact broadheads when possible, added front weight through inserts, and arrow choice based on shot distance, wind, and animal size.</p>
+
+      <div class="game-grid">
+        <article class="game-card">
+          <h3>Small game and turkey</h3>
+          <p>Favor speed, forgiveness, and compact steering surfaces when shots may be quick and animals move often.</p>
+          <ul>
+            <li>Recommended arrow family: Sonic KE or 5.0 style lightweight build.</li>
+            <li>Front weight target: 50 to 75 grain insert plus 100 grain head.</li>
+            <li>Typical use: turkey, small game, and fast opportunities at modest penetration demand.</li>
+          </ul>
+        </article>
+        <article class="game-card">
+          <h3>Medium game</h3>
+          <p>This is the broadest category and fits the common deer and antelope use case where speed and practical field accuracy both matter.</p>
+          <ul>
+            <li>Recommended arrow family: Axis, Sonic KE, or 5.0.</li>
+            <li>Front weight target: 75 grain brass insert with compact 100 grain broadhead.</li>
+            <li>Typical use: whitetail, pronghorn, mule deer, and open-country shots.</li>
+          </ul>
+        </article>
+        <article class="game-card">
+          <h3>Large game</h3>
+          <p>Move toward tougher shafts, more penetration bias, and stable fixed-blade control when hunting elk-sized animals.</p>
+          <ul>
+            <li>Recommended arrow family: Axis or 5.0 for versatile western hunting; FMJ when range is shorter and penetration is prioritized.</li>
+            <li>Front weight target: 75 grain insert with 100 grain head, or heavier front build if tune remains clean.</li>
+            <li>Typical use: elk, red deer, wild boar, and larger-bodied deer.</li>
+          </ul>
+        </article>
+        <article class="game-card">
+          <h3>Heavy game</h3>
+          <p>Use a heavier arrow philosophy where close-range penetration matters more than a flat trajectory.</p>
+          <ul>
+            <li>Recommended arrow family: FMJ or another heavier, high-momentum build.</li>
+            <li>Front weight target: heavy insert system with strong fixed head; total weight biased upward for dangerous or very large game.</li>
+            <li>Typical use: moose, buffalo, and other heavy game under legal and guided conditions.</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="game-table-wrap">
+        <table>
+          <thead><tr><th>Game group</th><th>Nock On style arrow setup</th><th>Broadhead approach</th><th>Typical animals</th><th>Setup intent</th></tr></thead>
+          <tbody>
+            <tr><td class="game-category">Small game and turkey</td><td>Sonic KE or 5.0, lighter shaft with 50 to 75 grain front insert.</td><td>Compact 100 grain head for tune and fast steering.</td><td>Turkey, rabbit, squirrel where legal.</td><td>Speed, quick range forgiveness, and lower wind drift.</td></tr>
+            <tr><td class="game-category">Medium game</td><td>Axis, Sonic KE, or 5.0 with 75 grain brass insert and balanced total weight.</td><td>Compact 100 grain broadhead, mechanical or fixed if tuned well.</td><td>Whitetail, antelope, mule deer.</td><td>Accuracy first, flexible for mixed distances.</td></tr>
+            <tr><td class="game-category">Large game</td><td>Axis or 5.0 for western versatility, FMJ when penetration bias matters.</td><td>Strong fixed blade or tuned compact head with added front weight.</td><td>Elk, red deer, wild boar, black bear.</td><td>More penetration and better broadhead control on heavier animals.</td></tr>
+            <tr><td class="game-category">Heavy game</td><td>FMJ or other heavier high-momentum arrow with substantial front loading.</td><td>Durable fixed blade with weight-forward build.</td><td>Moose, buffalo, eland.</td><td>Close-range maximum penetration over trajectory.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="footer-note">This section follows Nock On guidance that accuracy, arrow consistency, straightness, and practical tuning matter more than chasing a single KE number.</p>
+    </section>
+
+    <section class="table-card">
+      <h2>Version history</h2>
+      <p class="section-copy">Track updates to the calculator so changes to formulas, category guidance, and broadhead integration stay easy to review.</p>
+      <div class="game-table-wrap">
+        <table>
+          <thead><tr><th>Version</th><th>Date</th><th>Changes</th></tr></thead>
+          <tbody>
+            <tr><td class="game-category">1.0.2</td><td>2026-10-20</td><td>Integrated selectable broadheads with images, added broadhead profile display, and replaced generic game guidance with Nock On style arrow setup recommendations by game group.</td></tr>
+            <tr><td class="game-category">1.0.1</td><td>2026-10-20</td><td>Added broadhead-specific input handling, 30-yard drop-off table through 120 yards, game recommendation categories, and animal guidance table.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="footer-note">Use the next version number for future revisions so the file can act as its own lightweight change log.</p>
+    </section>
   </div>
 
-  <div class="panel">
-    <h2>Arrow Build</h2>
-    <div class="ref-note">Reference shaft: <strong>Easton 5mm Axis 260 Match Grade</strong> (11.5 GPI, +/-0.001" straightness, 260 spine) - defaults below are built around this shaft class. Recommended arrows in the table now use the <strong>Nock On</strong> lineup (Axis, FMJ, Sonic KE).</div>
+  <script>
+    const broadheads = [
+      { id: 'g5-t2', name: 'G5 T2', weight: 100, type: 'Mechanical', use: 'Deer to elk', image: 'https://shop.nockonarchery.com/cdn/shop/files/T2-100gr-3pack.jpg?v=1711970807', description: 'John Dudley collaboration 2-blade expandable built for a compact 100-grain mechanical option.' },
+      { id: 'wasp-100-fixed', name: 'Wasp 100 Fixed Blade', weight: 100, type: 'Fixed blade', use: 'Deer and mixed medium game', image: 'https://www.feradyne.com/wp-content/uploads/2020/07/Wasp-Boss-4-Blade-100gr.png', description: 'A 100-grain fixed-blade category option for hunters who want simple deployment-free cutting performance.' },
+      { id: 'ironwill-100-db-bleeder', name: 'Iron Will 100 Double Bevel with Bleeder', weight: 100, type: 'Fixed blade', use: 'Medium to large game', image: 'https://ironwilloutfitters.com/cdn/shop/files/S100BH-SB-3Q.jpg?v=1696972284', description: 'Compact Iron Will style head with bleeders, aimed at strong penetration and controlled flight after tuning.' },
+      { id: 'ironwill-150-sb', name: 'Iron Will 150 Single Bevel', weight: 150, type: 'Fixed blade', use: 'Large game', image: 'https://ironwilloutfitters.com/cdn/shop/files/S150BH-SB-3Q.jpg?v=1696972298', description: 'Heavier single-bevel style choice for hunters wanting additional front mass and a penetration-biased setup.' },
+      { id: 'ironwill-200-buffalo', name: 'Iron Will 200 Buffalo', weight: 200, type: 'Fixed blade', use: 'Heavy game', image: 'https://ironwilloutfitters.com/cdn/shop/files/200SBBH-3Q.jpg?v=1696972314', description: 'Very heavy dangerous-game style broadhead for maximum front loading and close-range penetration priority.' }
+    ];
 
-    <div class="mode-toggle">
-      <button id="modeComponentBtn" class="active">Enter by Component</button>
-      <button id="modeTotalBtn">Enter Total Weight</button>
-    </div>
+    const drawWeightEl = document.getElementById('drawWeight');
+    const arrowLengthEl = document.getElementById('arrowLength');
+    const arrowWeightEl = document.getElementById('arrowWeight');
+    const broadheadSelectEl = document.getElementById('broadheadSelect');
+    const broadheadWeightEl = document.getElementById('broadheadWeight');
+    const speedEl = document.getElementById('speed');
+    const totalWeightEl = document.getElementById('totalWeight');
+    const keValueEl = document.getElementById('keValue');
+    const momentumValueEl = document.getElementById('momentumValue');
+    const gppValueEl = document.getElementById('gppValue');
+    const summaryNoteEl = document.getElementById('summaryNote');
+    const dropoffBody = document.getElementById('dropoffBody');
+    const broadheadNameEl = document.getElementById('broadheadName');
+    const broadheadDescriptionEl = document.getElementById('broadheadDescription');
+    const broadheadTypeEl = document.getElementById('broadheadType');
+    const broadheadMassEl = document.getElementById('broadheadMass');
+    const broadheadUseEl = document.getElementById('broadheadUse');
+    const distances = [0, 30, 60, 90, 120];
 
-    <div id="componentMode">
-      <div class="grid">
-        <div class="field">
-          <label for="arrowLength">Arrow Length (inches)</label>
-          <input type="number" id="arrowLength" value="29.5" step="0.1" min="20" max="36">
-        </div>
-        <div class="field">
-          <label for="shaftWeight">Shaft Weight (grains)</label>
-          <input type="number" id="shaftWeight" value="388" min="50" max="700">
-        </div>
-        <div class="field">
-          <label for="hardwareWeight">Insert / Nock / Vane Hardware (grains)</label>
-          <input type="number" id="hardwareWeight" value="50" min="0" max="150">
-        </div>
-        <div class="field">
-          <label for="broadheadSelectComp">Broadhead</label>
-          <select id="broadheadSelectComp">
-            <option value="100">100 gr - Iron Will (double bevel, with bleeder)</option>
-            <option value="150">150 gr - Iron Will (single bevel, no bleeder)</option>
-            <option value="200">200 gr - Iron Will (single bevel, no bleeder)</option>
-            <option value="100">100 gr - Rage Hypodermic (mechanical, 2" cut)</option>
-            <option value="100">100 gr - G5 T2 (mechanical, 2" cut, all-steel)</option>
-            <option value="custom">Custom</option>
-          </select>
-        </div>
-      </div>
-      <div class="field hidden" id="customBHWrapComp">
-        <label for="customBHComp">Custom Broadhead Weight (grains)</label>
-        <input type="number" id="customBHComp" value="125" min="50" max="400">
-      </div>
-    </div>
-
-    <div id="totalMode" class="hidden">
-      <div class="grid">
-        <div class="field">
-          <label for="arrowLengthTotal">Arrow Length (inches)</label>
-          <input type="number" id="arrowLengthTotal" value="29.5" step="0.1" min="20" max="36">
-        </div>
-        <div class="field">
-          <label for="totalWeight">Total Finished Arrow Weight (grains)</label>
-          <input type="number" id="totalWeight" value="538" min="200" max="1200">
-        </div>
-        <div class="field">
-          <label for="broadheadSelectTotal">Broadhead</label>
-          <select id="broadheadSelectTotal">
-            <option value="100">100 gr - Iron Will (double bevel, with bleeder)</option>
-            <option value="150">150 gr - Iron Will (single bevel, no bleeder)</option>
-            <option value="200">200 gr - Iron Will (single bevel, no bleeder)</option>
-            <option value="100">100 gr - Rage Hypodermic (mechanical, 2" cut)</option>
-            <option value="100">100 gr - G5 T2 (mechanical, 2" cut, all-steel)</option>
-            <option value="custom">Custom</option>
-          </select>
-        </div>
-      </div>
-      <div class="field hidden" id="customBHWrapTotal">
-        <label for="customBHTotal">Custom Broadhead Weight (grains)</label>
-        <input type="number" id="customBHTotal" value="125" min="50" max="400">
-      </div>
-    </div>
-  </div>
-
-  <div class="panel">
-    <h2>Results</h2>
-    <div class="results">
-      <div class="stat"><div class="label">Total Arrow Weight</div><div class="value" id="resTotalWeight">--</div></div>
-      <div class="stat"><div class="label">Kinetic Energy</div><div class="value" id="resKE">--</div></div>
-      <div class="stat"><div class="label">Momentum</div><div class="value" id="resMomentum">--</div></div>
-      <div class="stat"><div class="label">FOC</div><div class="value" id="resFOC">--</div></div>
-    </div>
-    <div class="foc-bar-wrap"><div class="foc-bar-bg"><div class="foc-bar-fill" id="focBarFill" style="width:0%"></div></div></div>
-  </div>
-
-  <div class="panel">
-    <h2>Game Class Suitability</h2>
-    <div class="table-scroll">
-      <table>
-        <thead><tr><th>Game Category</th><th>Representative Species</th><th>Recommended Arrow KE</th><th>Min. Arrow Weight</th><th>Status</th></tr></thead>
-        <tbody id="gameTableBody"></tbody>
-      </table>
-    </div>
-    <div class="table-hint">Click any row to see the recommended arrow build, arrow weight, and status detail in a popup.</div>
-  </div>
-
-  <footer>
-    Iron Will 100gr is a double-bevel head with a bleeder blade for a wider wound channel; the 150gr and 200gr Iron Will options are single-bevel, no-bleeder heads built for continued rotation through bone and thick hide on heavier game.<br>
-    Rage Hypodermic and G5 T2 are mechanical (rear-deploying) broadheads with 2" cutting diameters - excellent for deer-class game where wound channel size matters most, but generally not recommended for dangerous or heavy-boned game where fixed/single-bevel heads hold up better on bone impact.<br>
-    Dangerous Game hunts (Cape Buffalo, Elephant, Hippo, Rhino) in South Africa legally require a minimum 80 lb draw weight and 750-grain arrow at minimum, with many outfitters preferring 100+ ft-lbs and 700-800+ grain arrows - verify current outfitter/PH requirements before booking.<br>
-    Nock On arrow recommendations are general guidance by shaft category; confirm exact spine via Nock On's spine chart or a pro shop.<br>
-    Green dot = meets minimum KE for that class. Red dot = below minimum KE for that class.<br>
-    Compound Bow Kinetic Energy Calculator - Version 1.8.1
-  </footer>
-</div>
-
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal-box">
-    <button class="modal-close" id="modalClose">&times;</button>
-    <h3 id="modalTitle"></h3>
-    <div class="modal-row"><span class="lbl">Representative Species:</span> <span id="modalExamples"></span></div>
-    <div class="modal-row"><span class="lbl">Recommended Arrow KE:</span> <span id="modalKERange"></span></div>
-    <div class="modal-row"><span class="lbl">Minimum Arrow Weight:</span> <span id="modalArrowWeight"></span></div>
-    <div class="modal-row"><span class="lbl">Your Current KE:</span> <span id="modalCurrentKE"></span></div>
-    <div class="modal-row"><span class="lbl">Recommended Nock On Arrow:</span><br><span id="modalArrow"></span></div>
-    <div class="modal-row" id="modalNote" style="color:var(--muted);font-size:.82rem;"></div>
-  </div>
-</div>
-
-<script>
-const gameClasses = [
-  {name:"Small Game",examples:"Rabbits, Squirrels, Game Birds",keLabel:"< 25 ft-lbs",min:25,weightLabel:"300 grains",arrow:"Nock On AXIS 400/340 - lighter spine, efficient for small, thin-skinned game.",note:"Lighter shaft keeps speed high without over-building for small game."},
-  {name:"Medium Game",examples:"Whitetail Deer, Pronghorn, Antelope, Sheep",keLabel:"25 - 41 ft-lbs",min:25,weightLabel:"350 - 400 grains",arrow:"Nock On AXIS 300 - balanced weight and spine for deer-class game.",note:"Covers thin-skinned, deer-sized game including pronghorn and mountain sheep."},
-  {name:"Large Game",examples:"Elk, Black Bear, Wild Boar, Caribou",keLabel:"42 - 65 ft-lbs",min:42,weightLabel:"400 - 500 grains",arrow:"Nock On FMJ 300 - metal-jacketed shaft adds mass and durability for tougher, heavier animals.",note:"Elk, boar, and bear require more penetration than deer-class game."},
-  {name:"Toughest / Big Game",examples:"Moose, Grizzly Bear, African Plains Game (Kudu)",keLabel:"65 - 80 ft-lbs",min:65,weightLabel:"500 - 600 grains",arrow:"Nock On SONIC KE 250 - kinetic-energy-focused shaft built for heavy, deep-bodied game.",note:"Heavy bone structure and thick muscle mass call for high FOC and strong broadhead penetration."},
-  {name:"Dangerous Game",examples:"Cape Buffalo, Elephant, Hippo, Rhino",keLabel:"80+ ft-lbs (100+ preferred)",min:80,weightLabel:"700 - 800+ grains",arrow:"Nock On FMJ 250 (heavy-build, 750+ gr total) - maximum mass and stiffness for dangerous game.",note:"Legal minimums require 80 lb draw and 750 gr arrow; many outfitters prefer 100+ ft-lbs and 700-800+ gr for a true margin of safety. Use fixed/single-bevel heads (e.g. Iron Will 200gr) rather than mechanicals for this category."}
-];
-
-function $(id){ return document.getElementById(id); }
-function getBroadheadWeight(selectId, customId){
-  const sel = $(selectId).value;
-  if (sel === "custom") return parseFloat($(customId).value) || 0;
-  return parseFloat(sel);
-}
-function toggleCustomBH(){
-  $("customBHWrapComp").classList.toggle("hidden", $("broadheadSelectComp").value !== "custom");
-  $("customBHWrapTotal").classList.toggle("hidden", $("broadheadSelectTotal").value !== "custom");
-}
-let mode = "component";
-function setMode(newMode){
-  mode = newMode;
-  $("modeComponentBtn").classList.toggle("active", mode === "component");
-  $("modeTotalBtn").classList.toggle("active", mode === "total");
-  $("componentMode").classList.toggle("hidden", mode !== "component");
-  $("totalMode").classList.toggle("hidden", mode !== "total");
-  calculate();
-}
-function calculate(){
-  let arrowLength, totalWeight, bhWeight, shaftPortion;
-  if (mode === "component"){
-    arrowLength = parseFloat($("arrowLength").value) || 0;
-    const shaft = parseFloat($("shaftWeight").value) || 0;
-    const hardware = parseFloat($("hardwareWeight").value) || 0;
-    bhWeight = getBroadheadWeight("broadheadSelectComp", "customBHComp");
-    totalWeight = shaft + hardware + bhWeight;
-    shaftPortion = shaft + hardware;
-  } else {
-    arrowLength = parseFloat($("arrowLengthTotal").value) || 0;
-    totalWeight = parseFloat($("totalWeight").value) || 0;
-    bhWeight = getBroadheadWeight("broadheadSelectTotal", "customBHTotal");
-    shaftPortion = Math.max(totalWeight - bhWeight, 0);
-  }
-  const speed = parseFloat($("arrowSpeed").value) || 0;
-  const ke = (totalWeight * speed * speed) / 450240;
-  const momentum = (totalWeight * speed) / 225218;
-  let focPct = 0;
-  if (arrowLength > 0 && totalWeight > 0){
-    const physicalCenter = arrowLength / 2;
-    const shaftPerInch = shaftPortion / arrowLength;
-    const frontShaftWeight = shaftPerInch * physicalCenter;
-    const momentFront = bhWeight * arrowLength + frontShaftWeight * physicalCenter;
-    const balancePoint = momentFront / totalWeight;
-    focPct = ((balancePoint - physicalCenter) / arrowLength) * 100;
-  }
-  $("resTotalWeight").textContent = totalWeight.toFixed(1) + " gr";
-  $("resKE").textContent = ke.toFixed(1) + " ft-lbs";
-  $("resMomentum").textContent = momentum.toFixed(3) + " slug-ft/s";
-  $("resFOC").textContent = focPct.toFixed(1) + "%";
-  $("focBarFill").style.width = Math.max(Math.min(focPct * 3, 100), 0) + "%";
-  renderTable(ke, totalWeight);
-  return ke;
-}
-function renderTable(ke, totalWeight){
-  const body = $("gameTableBody");
-  body.innerHTML = "";
-  gameClasses.forEach((g, idx) => {
-    const meets = ke >= g.min;
-    const tr = document.createElement("tr");
-    tr.dataset.idx = idx;
-    tr.innerHTML = `
-      <td><span class="game-class-link">${g.name}</span></td>
-      <td>${g.examples}</td>
-      <td>${g.keLabel}</td>
-      <td>${g.weightLabel}</td>
-      <td><span class="dot ${meets ? 'green' : 'red'}"></span></td>
-    `;
-    tr.addEventListener("click", () => openModal(idx, ke, totalWeight));
-    body.appendChild(tr);
-  });
-}
-function openModal(idx, ke, totalWeight){
-  const g = gameClasses[idx];
-  const meets = ke >= g.min;
-  $("modalTitle").textContent = g.name;
-  $("modalExamples").textContent = g.examples;
-  $("modalKERange").textContent = g.keLabel;
-  $("modalArrowWeight").textContent = g.weightLabel;
-  const curEl = $("modalCurrentKE");
-  curEl.textContent = ke.toFixed(1) + " ft-lbs (arrow: " + totalWeight.toFixed(1) + " gr)";
-  curEl.className = "modal-ke " + (meets ? "green" : "red");
-  $("modalArrow").textContent = g.arrow;
-  $("modalNote").textContent = g.note;
-  $("modalOverlay").classList.add("open");
-}
-function closeModal(){ $("modalOverlay").classList.remove("open"); }
-
-$("modeComponentBtn").addEventListener("click", () => setMode("component"));
-$("modeTotalBtn").addEventListener("click", () => setMode("total"));
-$("broadheadSelectComp").addEventListener("change", () => { toggleCustomBH(); calculate(); });
-$("broadheadSelectTotal").addEventListener("change", () => { toggleCustomBH(); calculate(); });
-$("modalClose").addEventListener("click", closeModal);
-$("modalOverlay").addEventListener("click", (e) => { if (e.target === $("modalOverlay")) closeModal(); });
-document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
-
-["drawWeight","arrowSpeed","arrowLength","shaftWeight","hardwareWeight","customBHComp","arrowLengthTotal","totalWeight","customBHTotal"].forEach(id => $(id).addEventListener("input", calculate));
-
-toggleCustomBH();
-calculate();
-</script>
+    function clamp(value, min, max) { return Math.min(max, Math.max(min, value)); }
+    function estimateVelocityAtDistance(initialFps, distanceYards, totalGrains) {
+      const baseLoss = 0.045;
+      const distanceFactor = (distanceYards / 120) * 0.03;
+      const weightAdjustment = clamp((500 - totalGrains) / 50000, -0.012, 0.012);
+      const dragRate = baseLoss + distanceFactor + weightAdjustment;
+      const retainedFraction = Math.max(0.7, 1 - dragRate * (distanceYards / 120));
+      return initialFps * retainedFraction;
+    }
+    function classifyBuild(ke) {
+      if (ke >= 80) return 'a heavy-game-capable setup';
+      if (ke >= 65) return 'a strong large-game-capable setup';
+      if (ke >= 50) return 'a solid general hunting setup';
+      return 'a moderate-energy setup';
+    }
+    function populateBroadheads() {
+      broadheads.forEach((item, index) => {
+        const option = document.createElement('option');
+        option.value = item.id;
+        option.textContent = `${item.name} (${item.weight} gr)`;
+        if (index === 0) option.selected = true;
+        broadheadSelectEl.appendChild(option);
+      });
+      syncBroadheadProfile(true);
+    }
+    function getSelectedBroadhead() { return broadheads.find(item => item.id === broadheadSelectEl.value) || broadheads[0]; }
+    function syncBroadheadProfile(forceWeight = false) {
+      const selected = getSelectedBroadhead();
+      broadheadNameEl.textContent = selected.name;
+      broadheadDescriptionEl.textContent = selected.description;
+      broadheadTypeEl.textContent = selected.type;
+      broadheadMassEl.textContent = `${selected.weight} gr`;
+      broadheadUseEl.textContent = selected.use;
+      if (forceWeight) broadheadWeightEl.value = selected.weight;
+    }
+    function calculate() {
+      const drawWeight = parseFloat(drawWeightEl.value) || 0;
+      const arrowLength = parseFloat(arrowLengthEl.value) || 0;
+      const arrowWeight = parseFloat(arrowWeightEl.value) || 0;
+      const broadheadWeight = parseFloat(broadheadWeightEl.value) || 0;
+      const speed = parseFloat(speedEl.value) || 0;
+      const selected = getSelectedBroadhead();
+      const totalGrains = arrowWeight + broadheadWeight;
+      const ke = (totalGrains * speed * speed) / 450240;
+      const momentum = (totalGrains * speed) / 225218;
+      const gpp = drawWeight > 0 ? totalGrains / drawWeight : 0;
+      totalWeightEl.innerHTML = `${totalGrains.toFixed(0)}<span> gr</span>`;
+      keValueEl.innerHTML = `${ke.toFixed(1)}<span> ft-lbs</span>`;
+      momentumValueEl.innerHTML = `${momentum.toFixed(3)}<span> slug-ft/s</span>`;
+      gppValueEl.innerHTML = `${gpp.toFixed(2)}<span> gpp</span>`;
+      summaryNoteEl.textContent = `This projects ${classifyBuild(ke)} using a ${arrowLength.toFixed(1)} inch arrow, ${totalGrains.toFixed(0)} grain total mass, ${speed.toFixed(0)} fps, and the selected ${selected.name} broadhead.`;
+      dropoffBody.innerHTML = '';
+      distances.forEach(distance => {
+        const estimatedFps = estimateVelocityAtDistance(speed, distance, totalGrains);
+        const distanceKe = (totalGrains * estimatedFps * estimatedFps) / 450240;
+        const distanceMomentum = (totalGrains * estimatedFps) / 225218;
+        const energyDrop = ke - distanceKe;
+        const retained = ke > 0 ? (distanceKe / ke) * 100 : 0;
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${distance} yd</td><td>${estimatedFps.toFixed(1)}</td><td>${distanceKe.toFixed(1)} ft-lbs</td><td>${distanceMomentum.toFixed(3)}</td><td>${energyDrop.toFixed(1)} ft-lbs</td><td>${retained.toFixed(1)}%</td>`;
+        dropoffBody.appendChild(row);
+      });
+    }
+    broadheadSelectEl.addEventListener('change', () => { syncBroadheadProfile(true); calculate(); });
+    [drawWeightEl, arrowLengthEl, arrowWeightEl, speedEl].forEach(el => el.addEventListener('input', calculate));
+    populateBroadheads();
+    calculate();
+  </script>
 </body>
 </html>
