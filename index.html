@@ -57,11 +57,11 @@
     .mini-specs { display: flex; flex-wrap: wrap; gap: 8px; }
     .mini-specs span { display: inline-flex; align-items: center; padding: 6px 10px; border-radius: 999px; font-size: 0.75rem; border: 1px solid rgba(201,138,63,0.28); background: var(--color-primary-soft); color: var(--color-primary-strong); }
     .results { margin-top: 20px; }
-    .result-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 18px; }
+    .result-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-top: 18px; }
     .stat { background: var(--color-surface-2); border: 1px solid var(--color-border); border-radius: 12px; padding: 16px; text-align: center; }
     .stat .label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-faint); margin-bottom: 8px; }
-    .stat .value { font-size: 1.5rem; font-weight: 700; line-height: 1.15; }
-    .stat .value span { font-size: 0.95rem; color: var(--color-text-muted); font-weight: 400; }
+    .stat .value { font-size: 1.35rem; font-weight: 700; line-height: 1.15; }
+    .stat .value span { font-size: 0.9rem; color: var(--color-text-muted); font-weight: 400; }
     .summary-note { margin-top: 18px; color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.55; }
     .table-card { margin-top: 20px; }
     .table-wrap, .game-table-wrap { overflow-x: auto; margin-top: 16px; border: 1px solid var(--color-border); border-radius: 12px; }
@@ -80,7 +80,7 @@
     .game-category { font-weight: 600; color: var(--color-primary-strong); }
     .pill { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px; background: var(--color-primary-soft); color: var(--color-primary-strong); border: 1px solid rgba(201,138,63,0.28); font-size: 0.82rem; margin-top: 14px; }
     .pill::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--color-green); box-shadow: 0 0 10px rgba(99,193,116,0.4); }
-    @media (max-width: 900px) { .grid, .result-grid, .game-grid { grid-template-columns: 1fr 1fr; } .broadhead-card { grid-template-columns: 1fr; } .broadhead-card img { width: 100%; height: 220px; } }
+    @media (max-width: 980px) { .grid, .result-grid, .game-grid { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 700px) { .grid, .result-grid, .game-grid { grid-template-columns: 1fr; } body { padding-left: 12px; padding-right: 12px; } .card, .results, .table-card { padding: 18px; } }
   </style>
 </head>
@@ -88,14 +88,14 @@
   <div class="wrap">
     <header>
       <h1>🏹 Archery KE Calculator</h1>
-      <p class="subhead">Calculate total arrow weight, kinetic energy, momentum, and estimated downrange energy retention using your finished hunting arrow, selected broadhead, and measured FPS.</p>
-      <span class="version-tag">Version 1.0.2</span>
+      <p class="subhead">Calculate total arrow weight, kinetic energy, momentum, FOC, and estimated downrange energy retention using your finished hunting arrow, selected broadhead, and measured FPS.</p>
+      <span class="version-tag">Version 1.0.3</span>
     </header>
 
     <div class="grid">
       <section class="card">
         <h2>Bow setup</h2>
-        <p class="section-copy">Use your measured setup values. Arrow weight should include shaft components and inserts, then the selected broadhead is added automatically.</p>
+        <p class="section-copy">Use your measured setup values. This version assumes a Nock On style rear build with 4 Max Stealth vanes at 2.5-degree right helical as the standard configuration.</p>
 
         <div class="field">
           <label for="drawWeight">Draw weight <span class="unit">lbs</span></label>
@@ -112,19 +112,19 @@
         <div class="field">
           <label for="arrowWeight">Arrow weight excluding broadhead <span class="unit">grains</span></label>
           <input type="number" id="arrowWeight" value="438" min="1" step="1" />
-          <div class="hint">Include shaft, insert, collar, nock, vanes, and wrap if used.</div>
+          <div class="hint">Include shaft, insert, collar, nock, wrap, and the standard 4 Max Stealth vane set if they are already in your measured weight.</div>
         </div>
 
         <div class="field">
           <label for="broadheadSelect">Broadhead selection</label>
           <select id="broadheadSelect"></select>
-          <div class="hint">Selecting a broadhead updates weight, image, and setup guidance.</div>
+          <div class="hint">Selecting a broadhead updates weight and profile automatically.</div>
         </div>
 
         <div class="field">
           <label for="broadheadWeight">Broadhead weight <span class="unit">grains</span></label>
           <input type="number" id="broadheadWeight" value="100" min="0" step="1" readonly />
-          <div class="hint">Weight now follows the selected broadhead automatically.</div>
+          <div class="hint">Weight follows the selected broadhead automatically.</div>
         </div>
 
         <div class="field">
@@ -132,11 +132,17 @@
           <input type="number" id="speed" value="289" min="1" step="1" />
           <div class="hint">Use chronographed FPS for the exact finished hunting arrow and broadhead.</div>
         </div>
+
+        <div class="field">
+          <label for="balancePoint">Balance point from nock throat <span class="unit">inches</span></label>
+          <input type="number" id="balancePoint" value="19.25" min="0" step="0.05" />
+          <div class="hint">Measure from the throat of the nock to the arrow balance point to calculate FOC.</div>
+        </div>
       </section>
 
       <section class="card">
-        <h2>Broadhead profile</h2>
-        <p class="section-copy">This panel ties the chosen head to its blade style, weight, and intended use so the calculator stays connected to your hunting setup.</p>
+        <h2>Broadhead and rear-build profile</h2>
+        <p class="section-copy">This panel ties the chosen head to blade style, intended use, and the default rear steering setup for the calculator.</p>
         <div class="broadhead-card">
           <div class="broadhead-meta">
             <h3 id="broadheadName">G5 T2</h3>
@@ -145,12 +151,19 @@
               <span id="broadheadType">Mechanical</span>
               <span id="broadheadMass">100 gr</span>
               <span id="broadheadUse">Deer to elk</span>
+              <span>4 Max Stealth vanes</span>
+              <span>2.5° right helical</span>
+              <span>36 gr vane package</span>
             </div>
           </div>
         </div>
         <div class="field" style="margin-top:16px;">
           <label>Total arrow weight formula</label>
           <input type="text" value="Arrow weight excluding broadhead + selected broadhead weight" readonly />
+        </div>
+        <div class="field">
+          <label>FOC formula</label>
+          <input type="text" value="FOC % = ((balance point - arrow length ÷ 2) ÷ arrow length) × 100" readonly />
         </div>
         <div class="field">
           <label>Kinetic energy formula</label>
@@ -160,7 +173,7 @@
           <label>Momentum formula</label>
           <input type="text" value="Momentum = grains × FPS ÷ 225218" readonly />
         </div>
-        <div class="pill">Drop-off table and game setup guidance update automatically.</div>
+        <div class="pill">FOC, drop-off table, and game setup guidance update automatically.</div>
       </section>
     </div>
 
@@ -171,6 +184,7 @@
         <article class="stat"><div class="label">Kinetic energy</div><div class="value" id="keValue">0<span> ft-lbs</span></div></article>
         <article class="stat"><div class="label">Momentum</div><div class="value" id="momentumValue">0<span> slug-ft/s</span></div></article>
         <article class="stat"><div class="label">Grains per pound</div><div class="value" id="gppValue">0<span> gpp</span></div></article>
+        <article class="stat"><div class="label">FOC</div><div class="value" id="focValue">0<span>%</span></div></article>
       </div>
       <p class="summary-note" id="summaryNote"></p>
     </section>
@@ -198,7 +212,7 @@
           <ul>
             <li>Recommended arrow family: Sonic KE or 5.0 style lightweight build.</li>
             <li>Front weight target: 50 to 75 grain insert plus 100 grain head.</li>
-            <li>Typical use: turkey, small game, and fast opportunities at modest penetration demand.</li>
+            <li>Rear build standard: 4 Max Stealth vanes at 2.5-degree helical.</li>
           </ul>
         </article>
         <article class="game-card">
@@ -207,7 +221,7 @@
           <ul>
             <li>Recommended arrow family: Axis, Sonic KE, or 5.0.</li>
             <li>Front weight target: 75 grain brass insert with compact 100 grain broadhead.</li>
-            <li>Typical use: whitetail, pronghorn, mule deer, and open-country shots.</li>
+            <li>Rear build standard: 4 Max Stealth vanes at 2.5-degree helical.</li>
           </ul>
         </article>
         <article class="game-card">
@@ -216,16 +230,16 @@
           <ul>
             <li>Recommended arrow family: Axis or 5.0 for versatile western hunting; FMJ when range is shorter and penetration is prioritized.</li>
             <li>Front weight target: 75 grain insert with 100 grain head, or heavier front build if tune remains clean.</li>
-            <li>Typical use: elk, red deer, wild boar, and larger-bodied deer.</li>
+            <li>Rear build standard: 4 Max Stealth vanes at 2.5-degree helical.</li>
           </ul>
         </article>
         <article class="game-card">
           <h3>Heavy game</h3>
           <p>Use a heavier arrow philosophy where close-range penetration matters more than a flat trajectory.</p>
           <ul>
-            <li>Recommended arrow family: FMJ or another heavier, high-momentum build.</li>
-            <li>Front weight target: heavy insert system with strong fixed head; total weight biased upward for dangerous or very large game.</li>
-            <li>Typical use: moose, buffalo, and other heavy game under legal and guided conditions.</li>
+            <li>Recommended arrow family: FMJ or another heavier high-momentum arrow with strong front loading.</li>
+            <li>Front weight target: heavy insert system with strong fixed head and elevated FOC.</li>
+            <li>Rear build standard: 4 Max Stealth vanes at 2.5-degree helical.</li>
           </ul>
         </article>
       </div>
@@ -234,10 +248,10 @@
         <table>
           <thead><tr><th>Game group</th><th>Nock On style arrow setup</th><th>Broadhead approach</th><th>Typical animals</th><th>Setup intent</th></tr></thead>
           <tbody>
-            <tr><td class="game-category">Small game and turkey</td><td>Sonic KE or 5.0, lighter shaft with 50 to 75 grain front insert.</td><td>Compact 100 grain head for tune and fast steering.</td><td>Turkey, rabbit, squirrel where legal.</td><td>Speed, quick range forgiveness, and lower wind drift.</td></tr>
-            <tr><td class="game-category">Medium game</td><td>Axis, Sonic KE, or 5.0 with 75 grain brass insert and balanced total weight.</td><td>Compact 100 grain broadhead, mechanical or fixed if tuned well.</td><td>Whitetail, antelope, mule deer.</td><td>Accuracy first, flexible for mixed distances.</td></tr>
-            <tr><td class="game-category">Large game</td><td>Axis or 5.0 for western versatility, FMJ when penetration bias matters.</td><td>Strong fixed blade or tuned compact head with added front weight.</td><td>Elk, red deer, wild boar, black bear.</td><td>More penetration and better broadhead control on heavier animals.</td></tr>
-            <tr><td class="game-category">Heavy game</td><td>FMJ or other heavier high-momentum arrow with substantial front loading.</td><td>Durable fixed blade with weight-forward build.</td><td>Moose, buffalo, eland.</td><td>Close-range maximum penetration over trajectory.</td></tr>
+            <tr><td class="game-category">Small game and turkey</td><td>Sonic KE or 5.0, lighter shaft with 50 to 75 grain front insert and standard 4-fletch Max Stealth rear build.</td><td>Compact 100 grain head for tune and fast steering.</td><td>Turkey, rabbit, squirrel where legal.</td><td>Speed, quick range forgiveness, and lower wind drift.</td></tr>
+            <tr><td class="game-category">Medium game</td><td>Axis, Sonic KE, or 5.0 with 75 grain brass insert, balanced total weight, and the same standard 4-fletch rear build.</td><td>Compact 100 grain broadhead, mechanical or fixed if tuned well.</td><td>Whitetail, antelope, mule deer.</td><td>Accuracy first, flexible for mixed distances.</td></tr>
+            <tr><td class="game-category">Large game</td><td>Axis or 5.0 for western versatility, FMJ when penetration bias matters, with a stable 4 Max Stealth rear profile.</td><td>Strong fixed blade or tuned compact head with added front weight.</td><td>Elk, red deer, wild boar, black bear.</td><td>More penetration and better broadhead control on heavier animals.</td></tr>
+            <tr><td class="game-category">Heavy game</td><td>FMJ or other heavier high-momentum arrow with substantial front loading, elevated FOC, and the same 4-fletch Max Stealth helical setup.</td><td>Durable fixed blade with weight-forward build.</td><td>Moose, buffalo, eland.</td><td>Close-range maximum penetration over trajectory.</td></tr>
           </tbody>
         </table>
       </div>
@@ -251,7 +265,8 @@
         <table>
           <thead><tr><th>Version</th><th>Date</th><th>Changes</th></tr></thead>
           <tbody>
-            <tr><td class="game-category">1.0.2</td><td>2026-10-20</td><td>Integrated selectable broadheads with images, added broadhead profile display, and replaced generic game guidance with Nock On style arrow setup recommendations by game group.</td></tr>
+            <tr><td class="game-category">1.0.3</td><td>2026-10-20</td><td>Added FOC input and calculation, standardized the rear build around 4 Max Stealth vanes at 2.5-degree right helical, and removed all reliance on manual broadhead weight entry.</td></tr>
+            <tr><td class="game-category">1.0.2</td><td>2026-10-20</td><td>Integrated selectable broadheads with profile display and replaced generic game guidance with Nock On style arrow setup recommendations by game group.</td></tr>
             <tr><td class="game-category">1.0.1</td><td>2026-10-20</td><td>Added broadhead-specific input handling, 30-yard drop-off table through 120 yards, game recommendation categories, and animal guidance table.</td></tr>
           </tbody>
         </table>
@@ -262,11 +277,11 @@
 
   <script>
     const broadheads = [
-      { id: 'g5-t2', name: 'G5 T2', weight: 100, type: 'Mechanical', use: 'Deer to elk', image: 'https://shop.nockonarchery.com/cdn/shop/files/T2-100gr-3pack.jpg?v=1711970807', description: 'John Dudley collaboration 2-blade expandable built for a compact 100-grain mechanical option.' },
-      { id: 'wasp-100-fixed', name: 'Wasp 100 Fixed Blade', weight: 100, type: 'Fixed blade', use: 'Deer and mixed medium game', image: 'https://www.feradyne.com/wp-content/uploads/2020/07/Wasp-Boss-4-Blade-100gr.png', description: 'A 100-grain fixed-blade category option for hunters who want simple deployment-free cutting performance.' },
-      { id: 'ironwill-100-db-bleeder', name: 'Iron Will 100 Double Bevel with Bleeder', weight: 100, type: 'Fixed blade', use: 'Medium to large game', image: 'https://ironwilloutfitters.com/cdn/shop/files/S100BH-SB-3Q.jpg?v=1696972284', description: 'Compact Iron Will style head with bleeders, aimed at strong penetration and controlled flight after tuning.' },
-      { id: 'ironwill-150-sb', name: 'Iron Will 150 Single Bevel', weight: 150, type: 'Fixed blade', use: 'Large game', image: 'https://ironwilloutfitters.com/cdn/shop/files/S150BH-SB-3Q.jpg?v=1696972298', description: 'Heavier single-bevel style choice for hunters wanting additional front mass and a penetration-biased setup.' },
-      { id: 'ironwill-200-buffalo', name: 'Iron Will 200 Buffalo', weight: 200, type: 'Fixed blade', use: 'Heavy game', image: 'https://ironwilloutfitters.com/cdn/shop/files/200SBBH-3Q.jpg?v=1696972314', description: 'Very heavy dangerous-game style broadhead for maximum front loading and close-range penetration priority.' }
+      { id: 'g5-t2', name: 'G5 T2', weight: 100, type: 'Mechanical', use: 'Deer to elk', description: 'John Dudley collaboration 2-blade expandable built for a compact 100-grain mechanical option.' },
+      { id: 'wasp-100-fixed', name: 'Wasp 100 Fixed Blade', weight: 100, type: 'Fixed blade', use: 'Deer and mixed medium game', description: 'A 100-grain fixed-blade category option for hunters who want simple deployment-free cutting performance.' },
+      { id: 'ironwill-100-db-bleeder', name: 'Iron Will 100 Double Bevel with Bleeder', weight: 100, type: 'Fixed blade', use: 'Medium to large game', description: 'Compact Iron Will style head with bleeders, aimed at strong penetration and controlled flight after tuning.' },
+      { id: 'ironwill-150-sb', name: 'Iron Will 150 Single Bevel', weight: 150, type: 'Fixed blade', use: 'Large game', description: 'Heavier single-bevel style choice for hunters wanting additional front mass and a penetration-biased setup.' },
+      { id: 'ironwill-200-buffalo', name: 'Iron Will 200 Buffalo', weight: 200, type: 'Fixed blade', use: 'Heavy game', description: 'Very heavy dangerous-game style broadhead for maximum front loading and close-range penetration priority.' }
     ];
 
     const drawWeightEl = document.getElementById('drawWeight');
@@ -275,10 +290,12 @@
     const broadheadSelectEl = document.getElementById('broadheadSelect');
     const broadheadWeightEl = document.getElementById('broadheadWeight');
     const speedEl = document.getElementById('speed');
+    const balancePointEl = document.getElementById('balancePoint');
     const totalWeightEl = document.getElementById('totalWeight');
     const keValueEl = document.getElementById('keValue');
     const momentumValueEl = document.getElementById('momentumValue');
     const gppValueEl = document.getElementById('gppValue');
+    const focValueEl = document.getElementById('focValue');
     const summaryNoteEl = document.getElementById('summaryNote');
     const dropoffBody = document.getElementById('dropoffBody');
     const broadheadNameEl = document.getElementById('broadheadName');
@@ -289,6 +306,7 @@
     const distances = [0, 30, 60, 90, 120];
 
     function clamp(value, min, max) { return Math.min(max, Math.max(min, value)); }
+
     function estimateVelocityAtDistance(initialFps, distanceYards, totalGrains) {
       const baseLoss = 0.045;
       const distanceFactor = (distanceYards / 120) * 0.03;
@@ -297,12 +315,15 @@
       const retainedFraction = Math.max(0.7, 1 - dragRate * (distanceYards / 120));
       return initialFps * retainedFraction;
     }
-    function classifyBuild(ke) {
-      if (ke >= 80) return 'a heavy-game-capable setup';
-      if (ke >= 65) return 'a strong large-game-capable setup';
-      if (ke >= 50) return 'a solid general hunting setup';
-      return 'a moderate-energy setup';
+
+    function classifyBuild(ke, foc) {
+      const focText = foc >= 15 ? 'high FOC' : foc >= 10 ? 'moderate FOC' : 'lower FOC';
+      if (ke >= 80) return `a heavy-game-capable setup with ${focText}`;
+      if (ke >= 65) return `a strong large-game-capable setup with ${focText}`;
+      if (ke >= 50) return `a solid general hunting setup with ${focText}`;
+      return `a moderate-energy setup with ${focText}`;
     }
+
     function populateBroadheads() {
       broadheads.forEach((item, index) => {
         const option = document.createElement('option');
@@ -311,34 +332,45 @@
         if (index === 0) option.selected = true;
         broadheadSelectEl.appendChild(option);
       });
-      syncBroadheadProfile(true);
+      syncBroadheadProfile();
     }
-    function getSelectedBroadhead() { return broadheads.find(item => item.id === broadheadSelectEl.value) || broadheads[0]; }
-    function syncBroadheadProfile(forceWeight = false) {
+
+    function getSelectedBroadhead() {
+      return broadheads.find(item => item.id === broadheadSelectEl.value) || broadheads[0];
+    }
+
+    function syncBroadheadProfile() {
       const selected = getSelectedBroadhead();
       broadheadNameEl.textContent = selected.name;
       broadheadDescriptionEl.textContent = selected.description;
       broadheadTypeEl.textContent = selected.type;
       broadheadMassEl.textContent = `${selected.weight} gr`;
       broadheadUseEl.textContent = selected.use;
-      if (forceWeight) broadheadWeightEl.value = selected.weight;
+      broadheadWeightEl.value = selected.weight;
     }
+
     function calculate() {
       const drawWeight = parseFloat(drawWeightEl.value) || 0;
       const arrowLength = parseFloat(arrowLengthEl.value) || 0;
       const arrowWeight = parseFloat(arrowWeightEl.value) || 0;
       const broadheadWeight = parseFloat(broadheadWeightEl.value) || 0;
       const speed = parseFloat(speedEl.value) || 0;
+      const balancePoint = parseFloat(balancePointEl.value) || 0;
       const selected = getSelectedBroadhead();
+
       const totalGrains = arrowWeight + broadheadWeight;
       const ke = (totalGrains * speed * speed) / 450240;
       const momentum = (totalGrains * speed) / 225218;
       const gpp = drawWeight > 0 ? totalGrains / drawWeight : 0;
+      const foc = arrowLength > 0 ? (((balancePoint - (arrowLength / 2)) / arrowLength) * 100) : 0;
+
       totalWeightEl.innerHTML = `${totalGrains.toFixed(0)}<span> gr</span>`;
       keValueEl.innerHTML = `${ke.toFixed(1)}<span> ft-lbs</span>`;
       momentumValueEl.innerHTML = `${momentum.toFixed(3)}<span> slug-ft/s</span>`;
       gppValueEl.innerHTML = `${gpp.toFixed(2)}<span> gpp</span>`;
-      summaryNoteEl.textContent = `This projects ${classifyBuild(ke)} using a ${arrowLength.toFixed(1)} inch arrow, ${totalGrains.toFixed(0)} grain total mass, ${speed.toFixed(0)} fps, and the selected ${selected.name} broadhead.`;
+      focValueEl.innerHTML = `${foc.toFixed(1)}<span>%</span>`;
+      summaryNoteEl.textContent = `This projects ${classifyBuild(ke, foc)} using a ${arrowLength.toFixed(1)} inch arrow, ${totalGrains.toFixed(0)} grain total mass, ${speed.toFixed(0)} fps, ${foc.toFixed(1)}% FOC, the selected ${selected.name} broadhead, and the standard 4 Max Stealth 2.5-degree helical rear build.`;
+
       dropoffBody.innerHTML = '';
       distances.forEach(distance => {
         const estimatedFps = estimateVelocityAtDistance(speed, distance, totalGrains);
@@ -351,8 +383,14 @@
         dropoffBody.appendChild(row);
       });
     }
-    broadheadSelectEl.addEventListener('change', () => { syncBroadheadProfile(true); calculate(); });
-    [drawWeightEl, arrowLengthEl, arrowWeightEl, speedEl].forEach(el => el.addEventListener('input', calculate));
+
+    broadheadSelectEl.addEventListener('change', () => {
+      syncBroadheadProfile();
+      calculate();
+    });
+
+    [drawWeightEl, arrowLengthEl, arrowWeightEl, speedEl, balancePointEl].forEach(el => el.addEventListener('input', calculate));
+
     populateBroadheads();
     calculate();
   </script>
